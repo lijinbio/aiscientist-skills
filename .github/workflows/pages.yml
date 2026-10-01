@@ -3,7 +3,11 @@ name: Catalog site
 on:
   push:
     branches: [main]
-    paths: ["skills/**", "catalog.json", "src/aiscientist_skills/site.py"]
+    paths:
+      - "skills/**"
+      - "catalog.json"
+      - "src/aiscientist_skills/site.py"
+      - ".github/workflows/pages.yml"
   workflow_dispatch:
 
 permissions:

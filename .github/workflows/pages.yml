@@ -30,9 +30,17 @@ jobs:
       - uses: astral-sh/setup-uv@v6
       - run: uv sync --locked
       - run: uv run aiscientist-skill site --out _site
+      - name: Check that GitHub Pages is enabled
+        # The workflow token cannot enable Pages itself; an admin has to do it once.
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh api "repos/$GITHUB_REPOSITORY/pages" --silent 2>/dev/null; then
+            echo "::warning title=GitHub Pages is not enabled for $GITHUB_REPOSITORY::Enable it once under Settings → Pages → Build and deployment → Source: GitHub Actions (or run: gh api -X POST repos/$GITHUB_REPOSITORY/pages -f build_type=workflow), then re-run this workflow. The next step will fail until then."
+          fi
       - uses: actions/configure-pages@v5
         with:
-          # Enable Pages (source: GitHub Actions) on first run instead of failing with 404.
+          # Works where the token may enable Pages (some org setups); harmless otherwise.
           enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:

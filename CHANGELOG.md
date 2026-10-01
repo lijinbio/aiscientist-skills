@@ -12,6 +12,8 @@ All notable changes to this repository are documented here. The format follows
   pipx, uv or conda, the docs show the bare command, the pre-commit hook runs whatever
   `aiscientist-skill` is on `PATH`, and CI adds an "Install with pip" job. `uv.lock` remains the
   pin for CI's own dependency versions.
+- Docs show how to install the CLI straight from GitHub (`pip install git+https://…`, pipx,
+  `uvx --from`), pinned to a release tag.
 - Test matrix now covers Python 3.11 and 3.14; the package declares support through 3.14.
 - Registry framing: skills for scientific data analysis, with computational biology as the first
   category.

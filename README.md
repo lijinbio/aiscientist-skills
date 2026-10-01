@@ -126,12 +126,21 @@ locally that CI runs. It is a normal Python package, so install it with whatever
 use; the commands below are the same afterwards.
 
 ```bash
-# pick one
+# without a clone, straight from GitHub (pin a tag for reproducibility)
+pip install git+https://github.com/lijinbio/aiscientist-skills.git
+pipx install git+https://github.com/lijinbio/aiscientist-skills.git@v0.1.0
+uvx --from git+https://github.com/lijinbio/aiscientist-skills.git aiscientist-skill --help
+
+# from a clone, for contributing (pick one)
 pip install -e '.[dev]'                        # into the environment you have active
 pipx install -e '.[dev]'                       # isolated, on your PATH
 uv sync                                        # .venv from uv.lock; prefix commands with `uv run`
 conda create -n aiscientist-skills python=3.12 pip && conda activate aiscientist-skills && pip install -e '.[dev]'
 ```
+
+The CLI always operates on a checkout of this repository (it locates the root by
+`.claude-plugin/marketplace.json`), so the GitHub install is for using the tool against a clone
+or a fork without installing into it.
 
 ```bash
 aiscientist-skill new single-cell/my-skill --author "Your Name"

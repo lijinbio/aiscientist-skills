@@ -22,6 +22,13 @@ conda create -n aiscientist-skills python=3.12 pip && conda activate aiscientist
 pre-commit install               # optional: run the checks on every commit (pip/pipx/uvx install pre-commit)
 ```
 
+To get the CLI without an editable install (for example on a cluster where you only have a
+clone of the registry), install it from GitHub and run it inside the clone:
+
+```bash
+pip install git+https://github.com/lijinbio/aiscientist-skills.git      # or pipx install …
+```
+
 ### Add a skill
 
 ```bash

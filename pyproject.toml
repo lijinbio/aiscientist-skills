@@ -1,0 +1,81 @@
+[project]
+name = "aiscientist-skills"
+version = "0.1.0"
+description = "Registry tooling for AiScientist agent skills: scaffold, validate, catalog, review and package."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Jin Li" }]
+maintainers = [{ name = "Rui Chen Lab, University of California, Irvine" }]
+requires-python = ">=3.11"
+keywords = [
+  "agent-skills",
+  "data-analysis",
+  "bioinformatics",
+  "computational-biology",
+  "single-cell",
+  "reproducibility",
+]
+dependencies = [
+  "jsonschema>=4.23",
+  "pyyaml>=6",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+
+# `pip install -e '.[dev]'` for pip, pipx and conda users. Mirrors the `dev` dependency group
+# below, which uv uses; keep the two lists identical.
+[project.optional-dependencies]
+dev = [
+  "pytest>=8",
+  "ruff>=0.6",
+]
+
+[project.urls]
+Homepage = "https://lijinbio.github.io/aiscientist-skills/"
+Repository = "https://github.com/lijinbio/aiscientist-skills"
+Issues = "https://github.com/lijinbio/aiscientist-skills/issues"
+Changelog = "https://github.com/lijinbio/aiscientist-skills/blob/main/CHANGELOG.md"
+
+[project.scripts]
+aiscientist-skill = "aiscientist_skills.cli:main"
+
+[dependency-groups]
+dev = [
+  "pytest>=8",
+  "ruff>=0.6",
+]
+
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/aiscientist_skills"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM", "RUF"]
+ignore = ["E501", "S101", "S603", "S607"]  # line length is left to `ruff format`
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "skills"]
+addopts = "-q"

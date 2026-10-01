@@ -1,0 +1,23 @@
+name: Skill request
+description: Propose a new skill or a change to an existing one
+labels: [skill]
+body:
+  - type: input
+    id: name
+    attributes:
+      label: Skill name and category
+      placeholder: single-cell/integrate-snrna-with-harmony
+    validations:
+      required: true
+  - type: textarea
+    id: task
+    attributes:
+      label: Task
+      description: What analysis should the skill perform, on what inputs, producing what outputs?
+    validations:
+      required: true
+  - type: textarea
+    id: tested
+    attributes:
+      label: Tested run
+      description: Is there a completed run (data, tool versions, runtime) the skill can be built from? Instruction-only skills are welcome.

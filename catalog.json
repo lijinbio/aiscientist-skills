@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "registry": "aiscientist-skills",
+  "registry_version": "0.1.0",
+  "generator": "aiscientist-skills 0.1.0",
+  "categories": [
+    {
+      "name": "single-cell",
+      "description": "Single-cell and single-nucleus RNA-seq: QC, integration, annotation and downstream analysis."
+    }
+  ],
+  "skills": [
+    {
+      "name": "qc-snrna-with-cellqc-standalone",
+      "category": "single-cell",
+      "path": "skills/single-cell/qc-snrna-with-cellqc-standalone",
+      "version": "1.0.0",
+      "status": "core",
+      "description": "Run the CellQC pipeline (ambient correction, count/feature/mitochondrial filtering, doublet calling, nuclear fraction) over a cohort of 10x Cell Ranger libraries with plain bash and conda only, from installing cellqc to validating result/metrics.csv. Use when setting up a cellqc environment, staging Cell Ranger outputs, writing a cellqc config.yaml (including mitochondrial/ribosomal/hemoglobin gene sets for mouse or non-human references), running locally or under Slurm, or diagnosing a failed or inert QC run.",
+      "tags": [
+        "snrna-seq",
+        "scrna-seq",
+        "qc",
+        "10x-genomics",
+        "cell-ranger",
+        "doublets",
+        "ambient-rna",
+        "snakemake"
+      ],
+      "license": "MIT",
+      "tested_with": "cellqc 0.3.6, Python 3.12.14, R 4.5.3, DoubletFinder 2.0.6, scDblFinder 1.24.10, SoupX 1.6.2, Seurat 5.5.1, Snakemake 9.22.0",
+      "author": "Jin Li",
+      "requirements": {
+        "compute": "16 CPUs, 80 GB requested (25.6 GB peak), 20 min for 4 libraries",
+        "gpu": false,
+        "scheduler": "optional",
+        "network": "install",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": false,
+      "has_tests": false
+    }
+  ]
+}

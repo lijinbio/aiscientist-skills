@@ -1,0 +1,29 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+      - id: check-merge-conflict
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.9
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
+  - repo: local
+    hooks:
+      # Runs the `aiscientist-skill` on your PATH, however you installed it (pip, pipx, uv,
+      # conda). See CONTRIBUTING.md, "Install the tooling".
+      - id: aiscientist-skill-validate
+        name: aiscientist-skill validate
+        entry: aiscientist-skill validate
+        language: system
+        pass_filenames: false
+        files: ^(skills/|evals/|template/|src/|\.claude-plugin/|README\.md$|catalog\.json$)

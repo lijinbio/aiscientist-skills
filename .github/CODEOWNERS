@@ -1,0 +1,10 @@
+# Default owners for everything in the repository.
+*                           @lijinbio
+
+# Registry tooling, CI and the contract every skill is validated against.
+/src/                       @lijinbio
+/.github/                   @lijinbio
+/.claude-plugin/            @lijinbio
+
+# Domain owners: one line per category. Add reviewers as categories grow.
+/skills/single-cell/        @lijinbio

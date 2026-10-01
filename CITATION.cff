@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: If you use skills from this registry in your research, please cite it.
+type: software
+title: AiScientist Skills
+abstract: Tested, reproducible agent skills for scientific data analysis, used by AiScientist. The catalog starts with computational biology.
+authors:
+  - family-names: Li
+    given-names: Jin
+    affiliation: Rui Chen Lab, University of California, Irvine
+license: MIT
+repository-code: https://github.com/lijinbio/aiscientist-skills
+url: https://lijinbio.github.io/aiscientist-skills/
+version: 0.1.0
+date-released: "2026-09-30"
+keywords:
+  - agent skills
+  - data analysis
+  - computational biology
+  - bioinformatics
+  - single-cell
+  - reproducibility

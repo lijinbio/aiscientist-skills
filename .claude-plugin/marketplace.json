@@ -1,0 +1,35 @@
+{
+  "name": "aiscientist-skills",
+  "owner": {
+    "name": "Rui Chen Lab, UC Irvine",
+    "url": "https://github.com/lijinbio"
+  },
+  "metadata": {
+    "description": "Tested, reproducible agent skills for scientific data analysis, used by AiScientist.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "single-cell",
+      "description": "Single-cell and single-nucleus RNA-seq: QC, integration, annotation and downstream analysis.",
+      "source": "./",
+      "strict": false,
+      "category": "science",
+      "keywords": [
+        "single-cell",
+        "scrna-seq",
+        "snrna-seq",
+        "bioinformatics"
+      ],
+      "author": {
+        "name": "Jin Li"
+      },
+      "license": "MIT",
+      "homepage": "https://lijinbio.github.io/aiscientist-skills/",
+      "repository": "https://github.com/lijinbio/aiscientist-skills",
+      "skills": [
+        "./skills/single-cell/qc-snrna-with-cellqc-standalone"
+      ]
+    }
+  ]
+}

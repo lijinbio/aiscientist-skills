@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lijinbio/aiscientist-skills/schemas/skill.schema.json",
+  "title": "AiScientist skill frontmatter",
+  "description": "Agent Skills SKILL.md frontmatter plus the AiScientist registry fields carried in `metadata`. Metadata values are strings, as the Agent Skills specification requires; lists are comma-separated.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "description", "license", "metadata"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "maxLength": 64,
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 40,
+      "maxLength": 1024,
+      "pattern": "^[^<>]*$"
+    },
+    "license": { "type": "string", "minLength": 1 },
+    "compatibility": { "type": "string", "maxLength": 500 },
+    "allowed-tools": { "type": "string" },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "required": ["category", "version", "status", "tested-with"],
+      "properties": {
+        "category": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+        "version": {
+          "type": "string",
+          "description": "Semantic version of the skill itself.",
+          "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-[0-9A-Za-z.-]+)?$"
+        },
+        "status": {
+          "type": "string",
+          "description": "core: maintained by the registry owners. verified: human-reviewed. community: passed CI, not reviewed.",
+          "enum": ["core", "verified", "community"]
+        },
+        "author": { "type": "string" },
+        "tags": { "type": "string", "description": "Comma-separated, lowercase." , "pattern": "^[a-z0-9-]+(, ?[a-z0-9-]+)*$" },
+        "tested-with": { "type": "string", "description": "Key tool versions of the run the skill was built from." },
+        "compute": { "type": "string", "description": "Resources of the tested run, e.g. '16 CPUs, 80 GB RAM, 20 min'." },
+        "requires-gpu": { "type": "string", "enum": ["true", "false"] },
+        "scheduler": { "type": "string", "enum": ["none", "optional", "required"], "description": "Whether an HPC scheduler (Slurm) is needed." },
+        "requires-network": {
+          "type": "string",
+          "enum": ["none", "install", "runtime"],
+          "description": "none: offline. install: only to install software. runtime: the analysis itself calls remote services."
+        },
+        "requires-secrets": {
+          "type": "string",
+          "description": "Comma-separated environment variable names the skill needs, or 'none'.",
+          "pattern": "^(none|[A-Z][A-Z0-9_]*(, ?[A-Z][A-Z0-9_]*)*)$"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+name: Skill bug
+description: A skill gives wrong instructions or fails as written
+labels: [bug]
+body:
+  - type: input
+    id: skill
+    attributes:
+      label: Skill
+      placeholder: single-cell/qc-snrna-with-cellqc-standalone
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: The step you ran, the exact error, and what you expected.
+    validations:
+      required: true
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: Tool versions, OS, scheduler.

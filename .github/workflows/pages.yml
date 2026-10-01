@@ -27,6 +27,9 @@ jobs:
       - run: uv sync --locked
       - run: uv run aiscientist-skill site --out _site
       - uses: actions/configure-pages@v5
+        with:
+          # Enable Pages (source: GitHub Actions) on first run instead of failing with 404.
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

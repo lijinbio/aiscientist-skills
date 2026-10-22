@@ -16,6 +16,7 @@ from aiscientist_skills.review import escalations
 
 ROOT = Path(__file__).resolve().parent.parent
 SKILL = "skills/single-cell/qc-snrna-with-cellqc-standalone/SKILL.md"
+NAME = "qc-snrna-with-cellqc-standalone"
 
 
 @pytest.fixture
@@ -74,7 +75,7 @@ def test_new_rejects_bad_names(repo: Path):
     ("old", "new", "message"),
     [
         ("status: core", "status: gold", "is not one of"),
-        ('version: "1.0.0"', 'version: "1.0"', "does not match"),
+        ('version: "1.1.0"', 'version: "1.1"', "does not match"),
         ("name: qc-snrna-with-cellqc-standalone", "name: other-name", "must match the directory"),
         ("category: single-cell", "category: genomics", "must match the directory"),
         ('requires-gpu: "false"', "requires-gpu: false", "is not of type 'string'"),
@@ -109,12 +110,13 @@ def test_package_is_reproducible(repo: Path, tmp_path: Path):
     out1, out2 = tmp_path / "a", tmp_path / "b"
     assert run(repo, "package", "--out", str(out1)) == 0
     assert run(repo, "package", "--out", str(out2)) == 0
-    z = out1 / "qc-snrna-with-cellqc-standalone-1.0.0.zip"
+    [skill] = [s for s in load_skills(repo) if s.name == NAME]
+    z = out1 / f"{NAME}-{skill.version}.zip"
     assert z.read_bytes() == (out2 / z.name).read_bytes()
     assert "qc-snrna-with-cellqc-standalone/SKILL.md" in zipfile.ZipFile(z).namelist()
     assert z.name in (out1 / "SHA256SUMS").read_text()
     catalog = json.loads((out1 / "catalog.json").read_text())
-    assert catalog["skills"][0]["status"] == "core"
+    assert [s["status"] for s in catalog["skills"] if s["name"] == NAME] == ["core"]
 
 
 def test_site_builds(repo: Path, tmp_path: Path):
@@ -158,7 +160,7 @@ def test_review_against_git_base(repo: Path, capsys):
 
 
 def test_records_expose_requirements():
-    [skill] = load_skills(ROOT)
+    [skill] = [s for s in load_skills(ROOT) if s.name == NAME]
     req = skill.to_record()["requirements"]
     assert req == {
         "compute": skill.meta["compute"],

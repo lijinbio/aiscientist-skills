@@ -293,7 +293,7 @@
       "path": "skills/single-cell/qc-snrna-with-cellqc-standalone",
       "version": "1.1.0",
       "status": "core",
-      "description": "Run the CellQC pipeline (ambient correction, count/feature/mitochondrial filtering, doublet calling, nuclear fraction) over a cohort of 10x Cell Ranger libraries by hand, with bash plus conda or a container, from installing cellqc to validating result/metrics.csv. Use when setting up a cellqc environment or container outside an AiScientist run, writing a cellqc config.yaml (including mitochondrial/ribosomal/hemoglobin gene sets for mouse or non-human references), or diagnosing a failed or inert QC run. Inside an AiScientist analysis, QC of Cell Ranger output is the run_cellqc tool, not this skill.",
+      "description": "Run the CellQC pipeline (ambient correction, count/feature/mitochondrial filtering, doublet calling, nuclear fraction) over a cohort of 10x Cell Ranger libraries by hand, with bash plus conda or a container, from installing cellqc to validating result/metrics.csv. Use when setting up a cellqc environment or container outside an AiScientist run, writing a cellqc config.yaml (including mitochondrial/ribosomal/hemoglobin gene sets for mouse or non-human references), or diagnosing a failed or inert QC run. Inside an AiScientist analysis, the run_cellqc tool runs this skill's pipeline; follow these steps there only for what run_cellqc does not expose.",
       "tags": [
         "snrna-seq",
         "scrna-seq",

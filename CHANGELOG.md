@@ -11,6 +11,9 @@ All notable changes to this repository are documented here. The format follows
 - `variants/normalize-vcf-with-bcftools`: the `bcftools norm` pipeline shell-quotes its paths,
   runs under `bash -c` instead of a login shell, and sets `pipefail` with every stage's stderr
   kept, so a failure in any stage is reported (review of #7).
+- `single-cell/qc-snrna-with-cellqc-standalone`: the description now says that inside AiScientist
+  the `run_cellqc` tool runs this skill's pipeline, instead of "not this skill", matching the body
+  and the plan for AiScientist to load its skills from this registry.
 - `CONTRIBUTING.md` documents the `metadata` keys AiScientist reads: `aliases`, `image`, `cpus`,
   `mem_gb` and `time_limit`.
 

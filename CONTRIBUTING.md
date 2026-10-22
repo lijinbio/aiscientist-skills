@@ -78,9 +78,16 @@ expertise, not code.
 | `metadata.scheduler` | no | `none`, `optional` or `required` |
 | `metadata.requires-network` | no | `none`, `install` or `runtime` |
 | `metadata.requires-secrets` | no | `none` or comma-separated env var names |
+| `metadata.aliases` | no | comma-separated older names the skill replaces; AiScientist resolves them, so existing plans and pipelines still find the skill |
+| `metadata.image` | no | software environment AiScientist builds to run the skill, e.g. `"bioconda:cellqc=0.3.6 python=3.12"` |
+| `metadata.cpus`, `mem_gb` | no | resources AiScientist requests for a run, as whole numbers, e.g. `"16"` and `"80"` |
+| `metadata.time_limit` | no | time limit AiScientist requests for a run, `HH:MM:SS`, e.g. `"08:00:00"` |
 
-All `metadata` values are strings, so quote `"true"`, `"false"` and versions. The authoritative
-definition is the [JSON Schema](src/aiscientist_skills/schemas/skill.schema.json).
+All `metadata` values are strings, so quote `"true"`, `"false"`, numbers and versions. The
+authoritative definition is the [JSON Schema](src/aiscientist_skills/schemas/skill.schema.json).
+`aliases`, `image`, `cpus`, `mem_gb` and `time_limit` are read by AiScientist's runtime
+(`run_in_environment`); the schema accepts any string key under `metadata`, so `validate` does not
+check them.
 
 **The description matters most.** It is all the agent sees when deciding whether to load the
 skill. Name the tool, the inputs, and the situations that should trigger it.

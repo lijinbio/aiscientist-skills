@@ -8,6 +8,12 @@ All notable changes to this repository are documented here. The format follows
 
 ### Changed
 
+- `variants/normalize-vcf-with-bcftools`: the `bcftools norm` pipeline shell-quotes its paths,
+  runs under `bash -c` instead of a login shell, and sets `pipefail` with every stage's stderr
+  kept, so a failure in any stage is reported (review of #7).
+- `CONTRIBUTING.md` documents the `metadata` keys AiScientist reads: `aliases`, `image`, `cpus`,
+  `mem_gb` and `time_limit`.
+
 - `single-cell/qc-snrna-with-cellqc-standalone` 1.1.0: Python pinned to `>=3.12,<3.14` in the
   install command, a container route (a pinned apptainer image built without root), when to use
   it and when not, and how it runs inside AiScientist (`image`, `cpus`, `mem_gb`, `time_limit` in

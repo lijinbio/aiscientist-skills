@@ -75,7 +75,7 @@ def test_new_rejects_bad_names(repo: Path):
     ("old", "new", "message"),
     [
         ("status: core", "status: gold", "is not one of"),
-        ('version: "1.1.0"', 'version: "1.1"', "does not match"),
+        ('version: "1.2.0"', 'version: "1.2"', "does not match"),
         ("name: qc-snrna-with-cellqc-standalone", "name: other-name", "must match the directory"),
         ("category: single-cell", "category: genomics", "must match the directory"),
         ('requires-gpu: "false"', "requires-gpu: false", "is not of type 'string'"),

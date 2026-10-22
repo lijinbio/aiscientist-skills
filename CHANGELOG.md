@@ -8,6 +8,10 @@ All notable changes to this repository are documented here. The format follows
 
 ### Changed
 
+- `single-cell/qc-snrna-with-cellqc-standalone` 1.2.0: ships its reference settings in
+  `assets/cellqc-defaults.json` (gene sets per reference, the expected doublet rate per chemistry
+  with the reaction capacity, and the default count filters), which AiScientist's `run_cellqc`
+  reads instead of keeping a copy (RCHENLAB/AiScientist#42). The Configure step points to it.
 - `variants/normalize-vcf-with-bcftools`: the `bcftools norm` pipeline shell-quotes its paths,
   runs under `bash -c` instead of a login shell, and sets `pipefail` with every stage's stderr
   kept, so a failure in any stage is reported (review of #7).

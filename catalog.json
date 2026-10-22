@@ -5,18 +5,261 @@
   "generator": "aiscientist-skills 0.1.0",
   "categories": [
     {
+      "name": "crispr-screens",
+      "description": "Pooled CRISPR screens with a single-cell readout (Perturb-seq): escaping cells, per-perturbation differential expression and effect sizes."
+    },
+    {
       "name": "single-cell",
       "description": "Single-cell and single-nucleus RNA-seq: QC, integration, annotation and downstream analysis."
+    },
+    {
+      "name": "variants",
+      "description": "DNA variant analysis from VCF files: normalization, callset QC, result tables, research triage and variant databases."
     }
   ],
   "skills": [
     {
+      "name": "compare-perturbations-to-control",
+      "category": "crispr-screens",
+      "path": "skills/crispr-screens/compare-perturbations-to-control",
+      "version": "1.0.0",
+      "status": "community",
+      "description": "Per-perturbation differential expression against one shared non-targeting control in a pooled CRISPR screen with single-cell readout (Perturb-seq, CROP-seq, CRISPRi or CRISPRa) with scanpy rank_genes_groups (Wilcoxon, explicit reference), from an AnnData with a guide or perturbation column to one DE table per perturbation, a summary table with a target self-knockdown positive control, and the genes shared across perturbations. Use when every guide or target gene must be compared with the same control cells (the AiScientist run_de tool does per-cluster one-vs-rest and does not do this), when collapsing guides to target genes, or when checking which guides lowered their own target.",
+      "tags": [
+        "crispr",
+        "perturb-seq",
+        "crop-seq",
+        "scrna-seq",
+        "differential-expression",
+        "scanpy",
+        "wilcoxon"
+      ],
+      "license": "MIT",
+      "tested_with": "scanpy 1.12.1, anndata 0.12.16, pandas 2.3.3, numpy 2.4.6, scipy 1.17.1, Python 3.13.9",
+      "author": "Yijun Sun",
+      "requirements": {
+        "compute": "1 CPU, under 0.5 GB RAM, seconds for 270 cells x 49 genes (4 perturbations)",
+        "gpu": false,
+        "scheduler": "none",
+        "network": "install",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": true,
+      "has_tests": true
+    },
+    {
+      "name": "filter-escapers-with-mixscape",
+      "category": "crispr-screens",
+      "path": "skills/crispr-screens/filter-escapers-with-mixscape",
+      "version": "1.0.0",
+      "status": "community",
+      "description": "Label and remove escaping cells in a pooled CRISPR screen with single-cell readout (Perturb-seq, CROP-seq) with Mixscape from pertpy, from a log-normalized AnnData with a guide or perturbation column and a non-targeting control to adata_mixscape.h5ad without the non-perturbed (NP) cells, plus the NP fraction of every perturbation. Use before per-perturbation differential expression when guide-assigned cells may have escaped knockout or knockdown and dilute the comparison, or when asked which cells of a screen were actually perturbed. Optional step with a heavy dependency; without pertpy the script exits cleanly and the DE runs on all guide-assigned cells.",
+      "tags": [
+        "crispr",
+        "perturb-seq",
+        "crop-seq",
+        "scrna-seq",
+        "mixscape",
+        "pertpy",
+        "escaping-cells"
+      ],
+      "license": "MIT",
+      "tested_with": "pertpy 1.4.0, scanpy 1.12.1, anndata 0.12.16, pandas 2.3.3, numpy 2.4.6, scipy 1.17.1, scikit-learn 1.9.1, pynndescent 0.6.0, numba 0.68.0, Python 3.13.9",
+      "author": "Yijun Sun",
+      "requirements": {
+        "compute": "1 CPU, 0.85 GB peak RAM, about 12 s for 240 cells x 47 genes (mostly pertpy import and JIT compilation)",
+        "gpu": false,
+        "scheduler": "none",
+        "network": "install",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": true,
+      "has_tests": true
+    },
+    {
+      "name": "rank-perturbations-by-edistance",
+      "category": "crispr-screens",
+      "path": "skills/crispr-screens/rank-perturbations-by-edistance",
+      "version": "1.0.0",
+      "status": "community",
+      "description": "Rank the perturbations of a pooled CRISPR screen with single-cell readout (Perturb-seq, CROP-seq, CRISPRi or CRISPRa) by E-distance (energy distance) to the non-targeting control in PCA space, with a label-permutation test and Benjamini-Hochberg correction, from an AnnData with a guide or perturbation column to a ranked CSV, the list of hits to carry into differential expression, and an optional perturbation-by-perturbation distance matrix. Use when asking which guides actually changed the transcriptome, when separating real hits from silent guides before per-perturbation DE, or when grouping perturbations with similar effects.",
+      "tags": [
+        "crispr",
+        "perturb-seq",
+        "crop-seq",
+        "scrna-seq",
+        "e-distance",
+        "energy-distance",
+        "permutation-test",
+        "scperturb"
+      ],
+      "license": "MIT",
+      "tested_with": "scanpy 1.12.1, anndata 0.12.16, pandas 2.3.3, numpy 2.4.6, scikit-learn 1.9.0, Python 3.13.9",
+      "author": "Yijun Sun",
+      "requirements": {
+        "compute": "1 CPU, under 0.5 GB RAM, seconds for 270 cells x 60 genes with 1000 permutations; about 0.1 s per perturbation per 1000 permutations with 2000 control cells and 30 PCs",
+        "gpu": false,
+        "scheduler": "none",
+        "network": "install",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": true,
+      "has_tests": true
+    },
+    {
+      "name": "annotate-clusters-by-markers",
+      "category": "single-cell",
+      "path": "skills/single-cell/annotate-clusters-by-markers",
+      "version": "1.0.0",
+      "status": "community",
+      "description": "Reference-free cell-type annotation of clusters from a curated marker panel with scanpy. Signature scores (score_genes) give a z-scored first pass, and the final label is decided on raw log-normalised expression of a few lineage-specific discriminator genes, so lineages that share markers are not mislabelled and clusters with no coherent signal stay Unassigned. Takes a clustered AnnData and writes per-cluster labels with the first-pass call, any correction and its evidence (JSON), a score matrix, a composition table and an annotated h5ad. Use when labelling clusters by markers instead of transferring labels from a reference atlas, when building a marker panel and discriminator table for a tissue, or when a score argmax gives suspicious labels. In AiScientist the built-in run_marker_annotation tool runs this procedure; use the script to change the procedure itself.",
+      "tags": [
+        "scrna-seq",
+        "snrna-seq",
+        "cell-type-annotation",
+        "marker-genes",
+        "scanpy",
+        "retina"
+      ],
+      "license": "MIT",
+      "tested_with": "scanpy 1.12.1, anndata 0.12.16, pandas 2.3.3, numpy 2.4.6, Python 3.13.9",
+      "author": "Yijun Sun",
+      "requirements": {
+        "compute": "1 CPU, under 1 GB RAM (0.3 GB peak), about 2 s for 240 cells x 181 genes",
+        "gpu": false,
+        "scheduler": "none",
+        "network": "install",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": true,
+      "has_tests": true
+    },
+    {
+      "name": "compare-conditions-by-celltype",
+      "category": "single-cell",
+      "path": "skills/single-cell/compare-conditions-by-celltype",
+      "version": "1.0.0",
+      "status": "community",
+      "description": "Condition-vs-control differential expression within each cell type (for example KO vs WT, or disease vs control, per cell type) with scanpy rank_genes_groups (Wilcoxon, explicit reference group). Takes an AnnData with a condition column and an existing cell-type column and writes per-cell-type DE tables, a volcano plot per cell type, a summary table, the genes changed in the same direction in two or more cell types, and the de_KEY_all.csv and universe hand-off files that enrichment reads. Use for a stratified condition comparison outside AiScientist, or inside it when the design is one the built-in tool cannot express (a paired or covariate-adjusted comparison, a custom shared-signature rule, a non-standard figure). In AiScientist, run_de with groupby, reference and stratify_by covers the common case.",
+      "tags": [
+        "scrna-seq",
+        "snrna-seq",
+        "differential-expression",
+        "scanpy",
+        "wilcoxon",
+        "cell-type"
+      ],
+      "license": "MIT",
+      "tested_with": "scanpy 1.12.1, anndata 0.12.16, pandas 2.3.3, numpy 2.4.6, matplotlib 3.10.9, Python 3.13.9",
+      "author": "Yijun Sun",
+      "requirements": {
+        "compute": "1 CPU, under 1 GB RAM (0.3 GB peak), about 2 s for 260 cells x 50 genes",
+        "gpu": false,
+        "scheduler": "none",
+        "network": "install",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": true,
+      "has_tests": true
+    },
+    {
+      "name": "compare-two-groups-with-scanpy",
+      "category": "single-cell",
+      "path": "skills/single-cell/compare-two-groups-with-scanpy",
+      "version": "1.0.0",
+      "status": "community",
+      "description": "Differential expression between two named groups of cells (for example disease vs control, or cluster 3 vs cluster 5) with scanpy rank_genes_groups (Wilcoxon) and an explicit reference group, from an AnnData file to a ranked CSV table and a JSON summary. Use when a question compares exactly two groups that a per-cluster one-vs-rest test does not answer, or when choosing the group column, the two groups and the significance thresholds for such a comparison.",
+      "tags": [
+        "scrna-seq",
+        "snrna-seq",
+        "differential-expression",
+        "scanpy",
+        "wilcoxon"
+      ],
+      "license": "MIT",
+      "tested_with": "scanpy 1.12.1, anndata 0.12.16, pandas 2.3.3, numpy 2.4.6, Python 3.13.9",
+      "author": "Yijun Sun",
+      "requirements": {
+        "compute": "1 CPU, under 1 GB RAM, seconds for 120 cells x 40 genes",
+        "gpu": false,
+        "scheduler": "none",
+        "network": "install",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": true,
+      "has_tests": true
+    },
+    {
+      "name": "crossvalidate-scgpt-vs-leiden",
+      "category": "single-cell",
+      "path": "skills/single-cell/crossvalidate-scgpt-vs-leiden",
+      "version": "1.0.0",
+      "status": "community",
+      "description": "Cross-validate scGPT per-cell cell-type predictions against the data's own structure. Joins the scGPT predictions CSV to a clustered AnnData by barcode, never by row position (scGPT labels every raw cell, QC keeps a subset), and for the Leiden clusters and any existing majorclass or celltype labels writes a reference-by-scGPT confusion table, each group's top scGPT label and purity, an exact-string agreement and the scGPT confidence distribution, as CSV and JSON. Use after scGPT label transfer (for example AiScientist's scgpt_annotate) to judge which predicted labels the data supports, to compare scGPT labels with labels the dataset already carries, or when merging predictions onto an AnnData fails with a length or alignment error.",
+      "tags": [
+        "scrna-seq",
+        "snrna-seq",
+        "cell-type-annotation",
+        "scgpt",
+        "clustering",
+        "validation"
+      ],
+      "license": "MIT",
+      "tested_with": "scanpy 1.12.1, anndata 0.12.16, pandas 2.3.3, numpy 2.4.6, Python 3.13.9",
+      "author": "Yijun Sun",
+      "requirements": {
+        "compute": "1 CPU, under 1 GB RAM (0.3 GB peak), seconds for 100 predicted and 85 clustered cells",
+        "gpu": false,
+        "scheduler": "none",
+        "network": "install",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": true,
+      "has_tests": true
+    },
+    {
+      "name": "prioritize-disease-genes-with-atlas",
+      "category": "single-cell",
+      "path": "skills/single-cell/prioritize-disease-genes-with-atlas",
+      "version": "1.0.0",
+      "status": "community",
+      "description": "Prioritize disease-associated genes by combining an existing condition-vs-control differential expression result (per cell type) with a precalculated cell-type atlas, offline. The atlas (long-form CSV, TSV or Parquet profiles, or an h5ad of profiles or of cells) adds cell-type expression specificity and, when present, an independent disease direction; these and the DE effect (plus FDR when the p-values are inferential) form a ranking score, written to tables/atlas/candidates.csv with a figure and a JSON summary. Use after a pseudobulk or reference-group DE, when an atlas can add independent cell-type evidence, when mapping mouse or Ensembl IDs onto a human atlas, or when checking candidates against a known-gene panel. It refuses one-vs-rest marker tables and computes no DE itself.",
+      "tags": [
+        "scrna-seq",
+        "snrna-seq",
+        "differential-expression",
+        "disease-genes",
+        "cell-atlas",
+        "gene-prioritization"
+      ],
+      "license": "MIT",
+      "tested_with": "pandas 2.3.3, numpy 2.4.6, matplotlib 3.10.9, anndata 0.12.16, scipy 1.17.1, Python 3.13.9",
+      "author": "Karry1123",
+      "requirements": {
+        "compute": "1 CPU, under 1 GB RAM (0.3 GB peak), seconds for 3-gene tables and a 123-cell atlas",
+        "gpu": false,
+        "scheduler": "none",
+        "network": "install",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": true,
+      "has_tests": true
+    },
+    {
       "name": "qc-snrna-with-cellqc-standalone",
       "category": "single-cell",
       "path": "skills/single-cell/qc-snrna-with-cellqc-standalone",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "status": "core",
-      "description": "Run the CellQC pipeline (ambient correction, count/feature/mitochondrial filtering, doublet calling, nuclear fraction) over a cohort of 10x Cell Ranger libraries with plain bash and conda only, from installing cellqc to validating result/metrics.csv. Use when setting up a cellqc environment, staging Cell Ranger outputs, writing a cellqc config.yaml (including mitochondrial/ribosomal/hemoglobin gene sets for mouse or non-human references), running locally or under Slurm, or diagnosing a failed or inert QC run.",
+      "description": "Run the CellQC pipeline (ambient correction, count/feature/mitochondrial filtering, doublet calling, nuclear fraction) over a cohort of 10x Cell Ranger libraries by hand, with bash plus conda or a container, from installing cellqc to validating result/metrics.csv. Use when setting up a cellqc environment or container outside an AiScientist run, writing a cellqc config.yaml (including mitochondrial/ribosomal/hemoglobin gene sets for mouse or non-human references), or diagnosing a failed or inert QC run. Inside an AiScientist analysis, QC of Cell Ranger output is the run_cellqc tool, not this skill.",
       "tags": [
         "snrna-seq",
         "scrna-seq",
@@ -40,6 +283,185 @@
       },
       "has_code": false,
       "has_tests": false
+    },
+    {
+      "name": "score-gene-signatures-with-scanpy",
+      "category": "single-cell",
+      "path": "skills/single-cell/score-gene-signatures-with-scanpy",
+      "version": "1.0.0",
+      "status": "community",
+      "description": "Score every cell for one or more gene signatures with scanpy score_genes (the signature's mean expression minus that of a matched random control gene set) and summarise each score per group, for example cell type by condition, as n, mean, median and IQR, with per-cell scores, box plots and a JSON coverage report. It looks genes up in the matrix actually scored (.raw when present), matches symbols case-insensitively and reports every remap, does not score a signature below a coverage threshold, and refuses integer counts. Use when a per-cell programme score is the deliverable, when the programme is in no gene-set library, or when choosing and checking signature genes for a scoring. To test whether a curated pathway shifts between conditions within a cell type, preranked GSEA on the full contrast ranking (AiScientist run_gsea_prerank) is the better tool.",
+      "tags": [
+        "scrna-seq",
+        "snrna-seq",
+        "gene-signature",
+        "module-score",
+        "scanpy"
+      ],
+      "license": "MIT",
+      "tested_with": "scanpy 1.12.1, anndata 0.12.16, pandas 2.3.3, numpy 2.4.6, matplotlib 3.10.9, Python 3.13.9",
+      "author": "Yijun Sun",
+      "requirements": {
+        "compute": "1 CPU, under 1 GB RAM (0.3 GB peak), about 2 s for 120 cells x 200 genes",
+        "gpu": false,
+        "scheduler": "none",
+        "network": "install",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": true,
+      "has_tests": true
+    },
+    {
+      "name": "build-variant-db-with-tiledbvcf",
+      "category": "variants",
+      "path": "skills/variants/build-variant-db-with-tiledbvcf",
+      "version": "1.0.0",
+      "status": "community",
+      "description": "Build and query a TileDB-VCF variant database for a cohort with tiledbvcf-py - ingest many indexed single-sample VCFs into one compressed sparse-array dataset (a re-run adds only new samples, with no re-merging), query genomic regions across all or selected samples, and export the matching records (sample, contig, position, alleles, genotype) to a TSV with per-sample counts. Use when a study has many single-sample VCFs and needs population-scale storage, incremental sample addition or fast region and sample queries instead of repeated bcftools merges. Skip it for a single VCF.",
+      "tags": [
+        "vcf",
+        "tiledb-vcf",
+        "variant-database",
+        "cohort",
+        "population-genomics",
+        "region-query"
+      ],
+      "license": "MIT",
+      "tested_with": "tiledbvcf-py 0.40.3, libtiledbvcf 0.40.3, tiledb 2.30.1, bcftools 1.24, htslib 1.23.1, pandas 2.3.3, numpy 2.5.4, Python 3.12.15",
+      "author": "Yijun Sun",
+      "requirements": {
+        "compute": "1 CPU, under 1 GB RAM, about 1 s for 3 single-sample VCFs of 1-3 records",
+        "gpu": false,
+        "scheduler": "none",
+        "network": "install",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": true,
+      "has_tests": true
+    },
+    {
+      "name": "normalize-vcf-with-bcftools",
+      "category": "variants",
+      "path": "skills/variants/normalize-vcf-with-bcftools",
+      "version": "1.0.0",
+      "status": "community",
+      "description": "Normalize a VCF with bcftools norm before annotation or ClinVar/gnomAD matching - split multiallelic sites into biallelic records, atomize MNPs into SNPs, then left-align and trim indels against the reference FASTA of the same build - writing an indexed normalized.vcf.gz and a JSON of record counts before and after. Use when a VCF not known to be normalized (especially an indel-heavy one) will be matched against ClinVar, gnomAD or dbSNP, compared between callers or loaded into PLINK, or when a known pathogenic indel comes back as not in ClinVar. In AiScientist, the offline annotate_variants path already normalizes, so do not plan it as a separate step there.",
+      "tags": [
+        "vcf",
+        "variant-normalization",
+        "bcftools",
+        "left-alignment",
+        "multiallelic",
+        "clinvar",
+        "gnomad"
+      ],
+      "license": "MIT",
+      "tested_with": "bcftools 1.24, htslib 1.23.1, Python 3.12.15",
+      "author": "Yijun Sun",
+      "requirements": {
+        "compute": "1 CPU, under 100 MB RAM, about 1 s for a 4-record VCF on a 60-base reference",
+        "gpu": false,
+        "scheduler": "none",
+        "network": "install",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": true,
+      "has_tests": true
+    },
+    {
+      "name": "prioritize-clinical-variants",
+      "category": "variants",
+      "path": "skills/variants/prioritize-clinical-variants",
+      "version": "1.0.0",
+      "status": "community",
+      "description": "Rank annotated variants into research-triage tiers (ClinVar pathogenic, likely pathogenic, VUS favouring pathogenic, VUS, likely benign, benign) from ClinVar significance used verbatim, gnomAD allele frequency against a dominant or recessive disease-model cutoff and the ACMG BA1 5 percent rule, and in-silico predictors (SIFT, PolyPhen, REVEL, CADD, AlphaMissense) as supporting evidence only. Pure Python; reads a per-variant annotation TSV and writes a tier-sorted CSV with the evidence for each tier plus a JSON of tier counts. Use when a rare-variant list from VEP, ClinVar and gnomAD annotation must be ordered for review (which variants to look at first) or when choosing the disease model and cutoffs for that ordering. Research triage only, NOT a clinical ACMG/AMP classification.",
+      "tags": [
+        "variant-prioritization",
+        "clinvar",
+        "gnomad",
+        "acmg",
+        "rare-disease",
+        "vus",
+        "in-silico-predictors"
+      ],
+      "license": "MIT",
+      "tested_with": "Python 3.12.15 and 3.13.9 (standard library only)",
+      "author": "Yijun Sun",
+      "requirements": {
+        "compute": "1 CPU, under 100 MB RAM, well under 1 s for 10 variants",
+        "gpu": false,
+        "scheduler": "none",
+        "network": "none",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": true,
+      "has_tests": true
+    },
+    {
+      "name": "qc-vcf-callset",
+      "category": "variants",
+      "path": "skills/variants/qc-vcf-callset",
+      "version": "1.0.0",
+      "status": "community",
+      "description": "Judge whether a germline VCF callset is trustworthy before interpreting any variant - Ti/Tv, Het/Hom, SNP, indel and multiallelic counts, sample count and genotype call rate from bcftools stats (falling back to cyvcf2, then to a plain-Python Ti/Tv scan) - and flag values outside the expected human WGS or WES ranges. Writes tables/vcf_qc_summary.csv and data/vcf_qc.json with a qc_flags list. Use when a VCF (one sample or a cohort) arrives for annotation or prioritization, when a Ti/Tv or Het/Hom value needs interpreting, or when deciding whether downstream variant tables must carry a low-confidence caveat.",
+      "tags": [
+        "vcf",
+        "qc",
+        "callset-qc",
+        "ti-tv",
+        "het-hom",
+        "call-rate",
+        "bcftools",
+        "cyvcf2",
+        "wgs",
+        "wes"
+      ],
+      "license": "MIT",
+      "tested_with": "bcftools 1.24, htslib 1.23.1, cyvcf2 0.34.0, numpy 2.5.4, Python 3.12.15 (plain-Python path also on 3.13.9)",
+      "author": "Yijun Sun",
+      "requirements": {
+        "compute": "1 CPU, under 100 MB RAM, about 1 s for a 5-record, 2-sample VCF",
+        "gpu": false,
+        "scheduler": "none",
+        "network": "install",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": true,
+      "has_tests": true
+    },
+    {
+      "name": "write-variant-tables",
+      "category": "variants",
+      "path": "skills/variants/write-variant-tables",
+      "version": "1.0.0",
+      "status": "community",
+      "description": "Write the five standard variant-annotation result tables - consequence, impact and ClinVar-significance distributions, a ClinVar pathogenic and likely-pathogenic list, and a shortlist of rare, damaging variants not in ClinVar - plus a JSON summary, from an annotated per-variant TSV (VEP consequence and impact, SIFT, PolyPhen, max population AF, rsID, ClinVar significance), in pure Python without re-parsing the VCF or re-running VEP. Use when a study needs these tables with a different rarity cutoff, impact set or damaging-predictor rule, or when rebuilding them from an existing annotation table. In AiScientist, annotate_variants already writes the default tables, so use this only for a custom cut.",
+      "tags": [
+        "variant-annotation",
+        "vep",
+        "clinvar",
+        "gnomad",
+        "result-tables",
+        "rare-variants"
+      ],
+      "license": "MIT",
+      "tested_with": "Python 3.12.15 and 3.13.9 (standard library only)",
+      "author": "Yijun Sun",
+      "requirements": {
+        "compute": "1 CPU, under 100 MB RAM, well under 1 s for 5 variants",
+        "gpu": false,
+        "scheduler": "none",
+        "network": "none",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": true,
+      "has_tests": true
     }
   ]
 }

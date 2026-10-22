@@ -33,13 +33,41 @@ expert · ⚪ **community** passed automated checks, not yet reviewed. See
 
 <!-- BEGIN SKILLS -->
 
+### crispr-screens
+
+Pooled CRISPR screens with a single-cell readout (Perturb-seq): escaping cells, per-perturbation differential expression and effect sizes.
+
+| Skill | Status | Version | What it does |
+| --- | --- | --- | --- |
+| [`compare-perturbations-to-control`](skills/crispr-screens/compare-perturbations-to-control/) | ⚪ community | 1.0.0 | Per-perturbation differential expression against one shared non-targeting control in a pooled CRISPR screen with single-cell readout (Perturb-seq, CROP-seq, CRISPRi or CRISPRa) with scanpy rank_genes_groups (Wilcoxon, explicit reference), from an AnnData with a guide or perturbation column to one DE table per perturbation, a summary table with a target self-knockdown positive control, and the genes shared across perturbations. |
+| [`filter-escapers-with-mixscape`](skills/crispr-screens/filter-escapers-with-mixscape/) | ⚪ community | 1.0.0 | Label and remove escaping cells in a pooled CRISPR screen with single-cell readout (Perturb-seq, CROP-seq) with Mixscape from pertpy, from a log-normalized AnnData with a guide or perturbation column and a non-targeting control to adata_mixscape.h5ad without the non-perturbed (NP) cells, plus the NP fraction of every perturbation. |
+| [`rank-perturbations-by-edistance`](skills/crispr-screens/rank-perturbations-by-edistance/) | ⚪ community | 1.0.0 | Rank the perturbations of a pooled CRISPR screen with single-cell readout (Perturb-seq, CROP-seq, CRISPRi or CRISPRa) by E-distance (energy distance) to the non-targeting control in PCA space, with a label-permutation test and Benjamini-Hochberg correction, from an AnnData with a guide or perturbation column to a ranked CSV, the list of hits to carry into differential expression, and an optional perturbation-by-perturbation distance matrix. |
+
 ### single-cell
 
 Single-cell and single-nucleus RNA-seq: QC, integration, annotation and downstream analysis.
 
 | Skill | Status | Version | What it does |
 | --- | --- | --- | --- |
-| [`qc-snrna-with-cellqc-standalone`](skills/single-cell/qc-snrna-with-cellqc-standalone/) | 🟢 core | 1.0.0 | Run the CellQC pipeline (ambient correction, count/feature/mitochondrial filtering, doublet calling, nuclear fraction) over a cohort of 10x Cell Ranger libraries with plain bash and conda only, from installing cellqc to validating result/metrics.csv. |
+| [`annotate-clusters-by-markers`](skills/single-cell/annotate-clusters-by-markers/) | ⚪ community | 1.0.0 | Reference-free cell-type annotation of clusters from a curated marker panel with scanpy. |
+| [`compare-conditions-by-celltype`](skills/single-cell/compare-conditions-by-celltype/) | ⚪ community | 1.0.0 | Condition-vs-control differential expression within each cell type (for example KO vs WT, or disease vs control, per cell type) with scanpy rank_genes_groups (Wilcoxon, explicit reference group). |
+| [`compare-two-groups-with-scanpy`](skills/single-cell/compare-two-groups-with-scanpy/) | ⚪ community | 1.0.0 | Differential expression between two named groups of cells (for example disease vs control, or cluster 3 vs cluster 5) with scanpy rank_genes_groups (Wilcoxon) and an explicit reference group, from an AnnData file to a ranked CSV table and a JSON summary. |
+| [`crossvalidate-scgpt-vs-leiden`](skills/single-cell/crossvalidate-scgpt-vs-leiden/) | ⚪ community | 1.0.0 | Cross-validate scGPT per-cell cell-type predictions against the data's own structure. |
+| [`prioritize-disease-genes-with-atlas`](skills/single-cell/prioritize-disease-genes-with-atlas/) | ⚪ community | 1.0.0 | Prioritize disease-associated genes by combining an existing condition-vs-control differential expression result (per cell type) with a precalculated cell-type atlas, offline. |
+| [`qc-snrna-with-cellqc-standalone`](skills/single-cell/qc-snrna-with-cellqc-standalone/) | 🟢 core | 1.1.0 | Run the CellQC pipeline (ambient correction, count/feature/mitochondrial filtering, doublet calling, nuclear fraction) over a cohort of 10x Cell Ranger libraries by hand, with bash plus conda or a container, from installing cellqc to validating result/metrics.csv. |
+| [`score-gene-signatures-with-scanpy`](skills/single-cell/score-gene-signatures-with-scanpy/) | ⚪ community | 1.0.0 | Score every cell for one or more gene signatures with scanpy score_genes (the signature's mean expression minus that of a matched random control gene set) and summarise each score per group, for example cell type by condition, as n, mean, median and IQR, with per-cell scores, box plots and a JSON coverage report. |
+
+### variants
+
+DNA variant analysis from VCF files: normalization, callset QC, result tables, research triage and variant databases.
+
+| Skill | Status | Version | What it does |
+| --- | --- | --- | --- |
+| [`build-variant-db-with-tiledbvcf`](skills/variants/build-variant-db-with-tiledbvcf/) | ⚪ community | 1.0.0 | Build and query a TileDB-VCF variant database for a cohort with tiledbvcf-py - ingest many indexed single-sample VCFs into one compressed sparse-array dataset (a re-run adds only new samples, with no re-merging), query genomic regions across all or selected samples, and export the matching records (sample, contig, position, alleles, genotype) to a TSV with per-sample counts. |
+| [`normalize-vcf-with-bcftools`](skills/variants/normalize-vcf-with-bcftools/) | ⚪ community | 1.0.0 | Normalize a VCF with bcftools norm before annotation or ClinVar/gnomAD matching - split multiallelic sites into biallelic records, atomize MNPs into SNPs, then left-align and trim indels against the reference FASTA of the same build - writing an indexed normalized.vcf.gz and a JSON of record counts before and after. |
+| [`prioritize-clinical-variants`](skills/variants/prioritize-clinical-variants/) | ⚪ community | 1.0.0 | Rank annotated variants into research-triage tiers (ClinVar pathogenic, likely pathogenic, VUS favouring pathogenic, VUS, likely benign, benign) from ClinVar significance used verbatim, gnomAD allele frequency against a dominant or recessive disease-model cutoff and the ACMG BA1 5 percent rule, and in-silico predictors (SIFT, PolyPhen, REVEL, CADD, AlphaMissense) as supporting evidence only. |
+| [`qc-vcf-callset`](skills/variants/qc-vcf-callset/) | ⚪ community | 1.0.0 | Judge whether a germline VCF callset is trustworthy before interpreting any variant - Ti/Tv, Het/Hom, SNP, indel and multiallelic counts, sample count and genotype call rate from bcftools stats (falling back to cyvcf2, then to a plain-Python Ti/Tv scan) - and flag values outside the expected human WGS or WES ranges. |
+| [`write-variant-tables`](skills/variants/write-variant-tables/) | ⚪ community | 1.0.0 | Write the five standard variant-annotation result tables - consequence, impact and ClinVar-significance distributions, a ClinVar pathogenic and likely-pathogenic list, and a shortlist of rare, damaging variants not in ClinVar - plus a JSON summary, from an annotated per-variant TSV (VEP consequence and impact, SIFT, PolyPhen, max population AF, rsID, ClinVar significance), in pure Python without re-parsing the VCF or re-running VEP. |
 
 <!-- END SKILLS -->
 

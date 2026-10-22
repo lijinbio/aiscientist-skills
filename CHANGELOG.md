@@ -49,7 +49,9 @@ All notable changes to this repository are documented here. The format follows
   - `variants/qc-vcf-callset` (was `vcf_qc_stats`); Het/Hom now reads het and hom-alt counts, and
     the call rate counts hom-ref calls
   - `variants/write-variant-tables` (was `variant_output_tables`)
-- Categories `crispr-screens` and `variants` (plugin entries and CODEOWNERS lines).
+  - `literature/recover-paper-pdfs` (was `literature-corpus-recovery`), instruction only: the ladder of
+    legal sources, from open-access APIs to institutional access, and the eight checks of every PDF
+- Categories `crispr-screens`, `variants` and `literature` (plugin entries and CODEOWNERS lines).
 - `single-cell/qc-snrna-with-cellqc-standalone` 1.0.0 (core): CellQC cohort QC for 10x
   snRNA-seq with bash and conda only, tested with cellqc 0.3.6 (DoubletFinder 2.0.6,
   Snakemake 9.22.0, Python 3.12.14).

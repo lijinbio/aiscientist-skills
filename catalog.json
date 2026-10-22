@@ -9,6 +9,10 @@
       "description": "Pooled CRISPR screens with a single-cell readout (Perturb-seq): escaping cells, per-perturbation differential expression and effect sizes."
     },
     {
+      "name": "literature",
+      "description": "Scientific literature: recovering, verifying and assembling full-text paper corpora for review and retrieval."
+    },
+    {
       "name": "single-cell",
       "description": "Single-cell and single-nucleus RNA-seq: QC, integration, annotation and downstream analysis."
     },
@@ -108,6 +112,36 @@
       },
       "has_code": true,
       "has_tests": true
+    },
+    {
+      "name": "recover-paper-pdfs",
+      "category": "literature",
+      "path": "skills/literature/recover-paper-pdfs",
+      "version": "1.0.0",
+      "status": "community",
+      "description": "Recover and assemble a corpus of scientific paper PDFs from a list of PMIDs or DOIs through a ladder of legal sources (open-access APIs, PMC and Europe PMC, publisher open access, then the user's institutional access through the campus network, VPN or library discovery search), verifying every PDF and tracking each paper in a manifest. Use when someone needs to download, recover, back-fill or assemble full-text PDFs from PMIDs or DOIs, especially to build a literature corpus for RAG or PaperQA, when papers are paywalled and need institutional access, or when they say \"download these papers\", \"get the full-text PDFs\" or \"the missing papers\". Use it even for a few papers; the value is trying the cheap open sources first and escalating only when needed.",
+      "tags": [
+        "literature",
+        "pdf",
+        "pubmed",
+        "open-access",
+        "corpus",
+        "rag",
+        "paperqa"
+      ],
+      "license": "MIT",
+      "tested_with": "a 1,749-PMID corpus run (2026): NCBI E-utilities, Unpaywall, OpenAlex, Semantic Scholar, poppler, ocrmypdf, pypdf, Chrome (versions not recorded)",
+      "author": "Ziyao Ma",
+      "requirements": {
+        "compute": "",
+        "gpu": false,
+        "scheduler": "none",
+        "network": "runtime",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": false,
+      "has_tests": false
     },
     {
       "name": "annotate-clusters-by-markers",

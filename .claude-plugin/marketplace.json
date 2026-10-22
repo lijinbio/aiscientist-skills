@@ -86,6 +86,28 @@
         "./skills/variants/qc-vcf-callset",
         "./skills/variants/write-variant-tables"
       ]
+    },
+    {
+      "name": "literature",
+      "description": "Scientific literature: recovering, verifying and assembling full-text paper corpora for review and retrieval.",
+      "source": "./",
+      "strict": false,
+      "category": "science",
+      "keywords": [
+        "literature",
+        "pubmed",
+        "full-text",
+        "corpus"
+      ],
+      "author": {
+        "name": "Ziyao Ma"
+      },
+      "license": "MIT",
+      "homepage": "https://lijinbio.github.io/aiscientist-skills/",
+      "repository": "https://github.com/lijinbio/aiscientist-skills",
+      "skills": [
+        "./skills/literature/recover-paper-pdfs"
+      ]
     }
   ]
 }

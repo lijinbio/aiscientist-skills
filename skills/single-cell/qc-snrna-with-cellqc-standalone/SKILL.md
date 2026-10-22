@@ -5,7 +5,7 @@ license: MIT
 compatibility: Requires bash, coreutils, tar, awk and conda or mamba (or apptainer); Slurm optional. Network access only to install packages.
 metadata:
   category: single-cell
-  version: "1.1.0"
+  version: "1.2.0"
   status: core
   author: "Jin Li"
   tags: "snrna-seq, scrna-seq, qc, 10x-genomics, cell-ranger, doublets, ambient-rna, snakemake"
@@ -258,6 +258,9 @@ metadata and print `$c["nreaction"]` instead of `1`.
 ## 4. Configure
 
 The config only needs the values that differ from the defaults (defaults merge in one level deep).
+The gene sets per reference, the expected doublet rate per chemistry with its capacity, and the
+default count filters are also in [`assets/cellqc-defaults.json`](assets/cellqc-defaults.json),
+which AiScientist's `run_cellqc` tool reads; change them there, not in a copy.
 This is the config the reference run used, for a **mouse GRCm39 (GENCODE)** reference and 3' v4
 nuclei:
 

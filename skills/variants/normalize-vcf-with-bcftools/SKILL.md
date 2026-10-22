@@ -95,8 +95,9 @@ export AISCIENTIST_WORK=/path/to/work AISCIENTIST_ARTIFACTS=/path/to/results
 python scripts/reference.py
 ```
 
-The pipe runs as `bash -lc` with the stderr of the first two stages discarded, so a failure shows
-the last stage's message. To see an earlier stage's error, run that `bcftools norm` command by hand.
+The pipe runs as `bash -c` with `set -o pipefail`, so a failure in any stage stops the run, and the
+error message includes the stderr of all three stages. Paths are shell-quoted, so file names with
+spaces or quotes are safe.
 
 In AiScientist: under the offline annotation path (`AISCIENTIST_VARIANT_ON_HPC`), do not plan a
 normalize step. `annotate_variants` already runs `bcftools norm -m-any -f REF` before VEP, which

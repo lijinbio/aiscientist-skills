@@ -18,6 +18,7 @@ with its .fai index). Needs bcftools on PATH.
 
 import json
 import os
+import shlex
 import shutil
 import subprocess
 from pathlib import Path
@@ -58,14 +59,17 @@ def _count(vcf: str) -> int:
 
 n_before = _count(INPUT_VCF)
 
-# The 3-stage norm as one shell pipeline run by bash, so the pipe is legible; every argument here
-# is a controlled path, not model/user free text. Split before atomize (see the docstring).
+# The 3-stage norm as one shell pipeline run by bash, so the pipe is legible. Split before atomize
+# (see the docstring). Paths are shell-quoted, so a name with spaces, quotes or `$` stays one
+# argument; pipefail makes a failure in any stage fail the run, and every stage's stderr is kept.
+q = shlex.quote
 pipeline = (
-    f"bcftools norm -m-any {INPUT_VCF!r} 2>/dev/null "
-    f"| bcftools norm --atomize 2>/dev/null "
-    f"| bcftools norm -f {REF_FASTA!r} -Oz -o {OUTPUT_VCF!r}"
+    "set -o pipefail; "
+    f"bcftools norm -m-any {q(INPUT_VCF)} "
+    "| bcftools norm --atomize "
+    f"| bcftools norm -f {q(REF_FASTA)} -Oz -o {q(OUTPUT_VCF)}"
 )
-proc = subprocess.run(["bash", "-lc", pipeline], capture_output=True, text=True)
+proc = subprocess.run(["bash", "-c", pipeline], capture_output=True, text=True)
 if proc.returncode != 0:
     raise SystemExit(f"bcftools norm failed (rc={proc.returncode}):\n{proc.stderr[-2000:]}")
 

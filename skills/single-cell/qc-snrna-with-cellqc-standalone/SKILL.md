@@ -1,16 +1,20 @@
 ---
 name: qc-snrna-with-cellqc-standalone
-description: Run the CellQC pipeline (ambient correction, count/feature/mitochondrial filtering, doublet calling, nuclear fraction) over a cohort of 10x Cell Ranger libraries with plain bash and conda only, from installing cellqc to validating result/metrics.csv. Use when setting up a cellqc environment, staging Cell Ranger outputs, writing a cellqc config.yaml (including mitochondrial/ribosomal/hemoglobin gene sets for mouse or non-human references), running locally or under Slurm, or diagnosing a failed or inert QC run.
+description: Run the CellQC pipeline (ambient correction, count/feature/mitochondrial filtering, doublet calling, nuclear fraction) over a cohort of 10x Cell Ranger libraries by hand, with bash plus conda or a container, from installing cellqc to validating result/metrics.csv. Use when setting up a cellqc environment or container outside an AiScientist run, writing a cellqc config.yaml (including mitochondrial/ribosomal/hemoglobin gene sets for mouse or non-human references), or diagnosing a failed or inert QC run. Inside an AiScientist analysis, QC of Cell Ranger output is the run_cellqc tool, not this skill.
 license: MIT
-compatibility: Requires bash, coreutils, tar, awk and conda or mamba; Slurm optional. Network access only to install packages.
+compatibility: Requires bash, coreutils, tar, awk and conda or mamba (or apptainer); Slurm optional. Network access only to install packages.
 metadata:
   category: single-cell
-  version: "1.0.0"
+  version: "1.1.0"
   status: core
   author: "Jin Li"
   tags: "snrna-seq, scrna-seq, qc, 10x-genomics, cell-ranger, doublets, ambient-rna, snakemake"
   tested-with: "cellqc 0.3.6, Python 3.12.14, R 4.5.3, DoubletFinder 2.0.6, scDblFinder 1.24.10, SoupX 1.6.2, Seurat 5.5.1, Snakemake 9.22.0"
   compute: "16 CPUs, 80 GB requested (25.6 GB peak), 20 min for 4 libraries"
+  image: "bioconda:cellqc=0.3.6 r-doubletfinder python=3.12"
+  cpus: "16"
+  mem_gb: "80"
+  time_limit: "08:00:00"
   requires-gpu: "false"
   scheduler: "optional"
   requires-network: "install"
@@ -39,13 +43,54 @@ Keep two trees separate:
 
 Never write into the Cell Ranger delivery itself. Treat it as read-only.
 
+## When to use
+
+- Running CellQC by hand on a cluster or a workstation: setting up the environment or container, staging
+  deliveries, writing the config, running, validating.
+- Diagnosing a CellQC run that failed, fell back, or whose filter was inert — including one that the
+  `run_cellqc` tool ran (its config, sample file and `cellqc.log` are under `work/cellqc/`).
+
+## When NOT to use
+
+- Inside an AiScientist analysis of Cell Ranger output, by default: call the `run_cellqc` tool. It
+  runs this same pipeline in a pinned image on the cluster, stages the libraries, applies this checklist,
+  and writes the checkpoint the later tools read. Re-doing it by hand with `run_code` loses all of
+  that. Follow this skill instead (through `run_in_environment`, below) only when the user asks for
+  it, or needs something `run_cellqc` does not expose: a cohort config, custom gene sets, a step
+  re-run with changed settings.
+- On a single matrix or an `.h5ad` with no raw matrix: CellQC needs Cell Ranger's raw and filtered
+  matrices; use `run_scanpy_qc`.
+
+## On AiScientist
+
+This skill declares its environment (`image` in its metadata), so inside an AiScientist run its
+commands run with `run_in_environment(skill="qc-snrna-with-cellqc-standalone", command=...)`. Each
+call is a 16-CPU / 80 GB Slurm job in that image. What changes from the steps below:
+
+- **Skip §1.** The image already has CellQC 0.3.6, DoubletFinder and Python 3.12; install nothing.
+- **Paths.** The delivery is `$AISCIENTIST_DATASET_ROOT`, read-only: one library, or a folder of
+  libraries (one per sub-folder). Use it as `/path/to/delivery`. Use `$AISCIENTIST_ENV_DIR` (the
+  working directory, which persists across calls in the run) as the project and data dir, e.g.
+  `stage=$AISCIENTIST_ENV_DIR/lnfiles` and `outdir=$AISCIENTIST_ENV_DIR/cellqc`.
+- **Threads.** `-t "$AISCIENTIST_JOB_CPUS"`.
+- **No sbatch.** The call already is a Slurm job: run `cellqc` in the foreground (§5's first form).
+  A full run fits one call (8 h limit), and the dry run can be its own call.
+- **Species.** One run takes one gene set. Run libraries of different species separately (§4).
+- **Deliverables.** Copy `result/metrics.csv`, `qc_status.csv`, `manifest.tsv`, `report.html` and
+  `report_slides.pdf` into `$AISCIENTIST_ARTIFACTS/cellqc/`, so they reach the report.
+- **Later analysis steps.** AiScientist's analysis tools read one merged AnnData,
+  `$AISCIENTIST_WORK/adata_qc.h5ad`, with a `sampleid` column. This image writes `.h5ad` with
+  anndata 0.13, and the analysis image's anndata 0.12 cannot write back pandas' nullable string
+  columns. So cast the `obs`/`var` text columns to `object` before writing the merged file.
+  `run_cellqc` does this merge for you.
+
 ## 1. Environment setup
 
 Install CellQC from bioconda into an env named after its version, so every result can be traced
 back to the exact code that made it:
 
 ```bash
-mamba create -y -n cellqc_v0.3.6 -c conda-forge -c bioconda cellqc=0.3.6 r-doubletfinder python=3.12
+mamba create -y -n cellqc_v0.3.6 -c conda-forge -c bioconda cellqc=0.3.6 r-doubletfinder "python>=3.12,<3.14"
 
 source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate cellqc_v0.3.6
@@ -57,13 +102,47 @@ Rscript -e "library(DoubletFinder)"  # must load without error
 
 Both extra packages are required:
 
-- **`r-doubletfinder`**: DoubletFinder is the default doublet caller, but the bioconda `cellqc`
-  0.3.6 package does not depend on it yet.
-- **`python=3.12`**: without it the solver picks Python 3.14. On 3.14 the `nuclear_fraction`
+- **`r-doubletfinder`**: DoubletFinder is the default doublet caller. The bioconda `cellqc` 0.3.6
+  package depends on it from build 1 (2026-10-02) on; naming it keeps older builds working.
+- **`python>=3.12,<3.14`** (AiScientist pins it below 3.14 in every route; the reference run used
+  3.12, and the image AiScientist builds pins `python=3.12`): without it the solver picks Python 3.14. On 3.14 the `nuclear_fraction`
   step fails for every library with `NameError: name 'snakemake' is not defined`, because 3.14
   changed how multiprocessing starts worker processes.
 
 `conda create` with the same arguments works if you don't have mamba.
+
+### Or a container (no conda on the host)
+
+The BioContainers image `quay.io/biocontainers/cellqc:0.3.6--pyhdfd78af_1` has everything, but was
+solved with **Python 3.14.7** (checked 2026-10-02), so `nuclear_fraction` fails in it whenever a BAM
+is present. Build a pinned image from the same bioconda packages instead. This needs no root, so it
+works on a shared cluster. Run it inside a batch job if your cluster bans downloads on login nodes
+(many do).
+
+```bash
+module load apptainer/1.4.5   # the version tested; load your site's apptainer
+W=${TMPDIR:-/tmp}/cellqc-build; mkdir -p "$W/pkgs" "$W/tmp"
+export APPTAINER_TMPDIR=$W/tmp APPTAINER_CACHEDIR=$W/cache
+apptainer build --sandbox "$W/box" docker://mambaorg/micromamba:2.9.0-debian12-slim
+mkdir -p "$W/box/aisci-pkgs" "$W/box/data" "$W/box/pub"   # plus any other path your site binds
+# --no-mount bind-paths: many clusters bind site paths (/data, /pub, ...) into every container,
+# which a writable sandbox cannot create mount points for.
+apptainer exec --writable --containall --no-mount bind-paths -B "$W/pkgs:/aisci-pkgs" "$W/box" \
+  bash -c 'export CONDA_PKGS_DIRS=/aisci-pkgs MAMBA_ROOT_PREFIX=/opt/conda;
+           micromamba install -y -n base -c conda-forge -c bioconda \
+             cellqc=0.3.6 r-doubletfinder "python>=3.12,<3.14" && micromamba clean -a -y'
+mkdir -p "$W/box/.singularity.d/env" "$W/box/etc/profile.d"
+echo 'export PATH=/opt/conda/bin:$PATH' > "$W/box/.singularity.d/env/90-conda.sh"
+echo 'export PATH=/opt/conda/bin:$PATH' > "$W/box/etc/profile.d/90-conda.sh"   # for bash -l
+apptainer build cellqc_0.3.6_py312.sif "$W/box"
+
+apptainer exec cellqc_0.3.6_py312.sif python --version   # Python 3.12.x
+```
+
+Then put `apptainer exec --containall -B <data> -B <outdir> cellqc_0.3.6_py312.sif` in front of
+every `cellqc` command below. AiScientist's `run_cellqc` tool declares exactly this recipe
+(`image: "bioconda:cellqc=0.3.6 r-doubletfinder python=3.12"`) and the platform builds it once, on
+first use, into the shared containers directory.
 
 The tested solve resolved to Python 3.12.14, R 4.5.3, r-doubletfinder 2.0.6, r-seurat 5.5.1,
 bioconductor-scdblfinder 1.24.10, r-soupx 1.6.2 and snakemake-minimal 9.22.0. The command

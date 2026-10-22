@@ -38,7 +38,7 @@ with no gnomAD record is treated as rare, and that absence from ClinVar is not e
 benignity.
 
 Adapted from the `classify_variant()` heuristic of the variant-calling-clinical-interpretation
-protocol of [operon](https://github.com/swaruplab/operon) (disease-model AF thresholds, ClinVar and
+protocol of [operon](https://github.com/swaruplab/operon) (MIT licence, Copyright (c) 2026 Swarup Lab) (disease-model AF thresholds, ClinVar and
 in-silico predictors).
 
 Tested on synthetic data only (`tests/`: 10 variants covering every tier, under both disease

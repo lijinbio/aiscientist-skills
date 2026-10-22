@@ -33,7 +33,7 @@ callset heavy with false positives. The most likely mistake is the wrong `SEQ_TY
 callset judged against the WGS band (or the reverse) is flagged, or passed, for the wrong reason.
 
 Adapted from the variant-calling-vcf-statistics protocol of
-[operon](https://github.com/swaruplab/operon), which also gives the expected ranges below.
+[operon](https://github.com/swaruplab/operon) (MIT licence, Copyright (c) 2026 Swarup Lab), which also gives the expected ranges below.
 
 Tested on synthetic data only (`tests/`: a 2-sample VCF of 4 SNPs and 1 deletion with known
 genotypes, run through each of the three methods, plus a 3-SNP VCF judged as WGS and as WES) with

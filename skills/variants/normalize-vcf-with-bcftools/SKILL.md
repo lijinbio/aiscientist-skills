@@ -38,7 +38,7 @@ The stage order is deliberate. Atomizing first makes bcftools 1.24 rewrite a mul
 genotypes. Splitting first gives clean biallelic records.
 
 Adapted from the variant-calling-variant-normalization protocol of
-[operon](https://github.com/swaruplab/operon), with the stage order changed as above.
+[operon](https://github.com/swaruplab/operon) (MIT licence, Copyright (c) 2026 Swarup Lab), with the stage order changed as above.
 
 Tested on synthetic data only (`tests/`: a one-sample VCF of 4 records on a 60-base reference,
 holding a multiallelic SNP, an MNP, a deletion inside a CA repeat and a plain SNP; 6 records come

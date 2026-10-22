@@ -28,7 +28,85 @@
       "homepage": "https://lijinbio.github.io/aiscientist-skills/",
       "repository": "https://github.com/lijinbio/aiscientist-skills",
       "skills": [
-        "./skills/single-cell/qc-snrna-with-cellqc-standalone"
+        "./skills/single-cell/annotate-clusters-by-markers",
+        "./skills/single-cell/compare-conditions-by-celltype",
+        "./skills/single-cell/compare-two-groups-with-scanpy",
+        "./skills/single-cell/crossvalidate-scgpt-vs-leiden",
+        "./skills/single-cell/prioritize-disease-genes-with-atlas",
+        "./skills/single-cell/qc-snrna-with-cellqc-standalone",
+        "./skills/single-cell/score-gene-signatures-with-scanpy"
+      ]
+    },
+    {
+      "name": "crispr-screens",
+      "description": "Pooled CRISPR screens with a single-cell readout (Perturb-seq): escaping cells, per-perturbation differential expression and effect sizes.",
+      "source": "./",
+      "strict": false,
+      "category": "science",
+      "keywords": [
+        "crispr",
+        "perturb-seq",
+        "single-cell",
+        "bioinformatics"
+      ],
+      "author": {
+        "name": "Yijun Sun"
+      },
+      "license": "MIT",
+      "homepage": "https://lijinbio.github.io/aiscientist-skills/",
+      "repository": "https://github.com/lijinbio/aiscientist-skills",
+      "skills": [
+        "./skills/crispr-screens/compare-perturbations-to-control",
+        "./skills/crispr-screens/filter-escapers-with-mixscape",
+        "./skills/crispr-screens/rank-perturbations-by-edistance"
+      ]
+    },
+    {
+      "name": "variants",
+      "description": "DNA variant analysis from VCF files: normalization, callset QC, result tables, research triage and variant databases.",
+      "source": "./",
+      "strict": false,
+      "category": "science",
+      "keywords": [
+        "vcf",
+        "variants",
+        "genomics",
+        "bioinformatics"
+      ],
+      "author": {
+        "name": "Yijun Sun"
+      },
+      "license": "MIT",
+      "homepage": "https://lijinbio.github.io/aiscientist-skills/",
+      "repository": "https://github.com/lijinbio/aiscientist-skills",
+      "skills": [
+        "./skills/variants/build-variant-db-with-tiledbvcf",
+        "./skills/variants/normalize-vcf-with-bcftools",
+        "./skills/variants/prioritize-clinical-variants",
+        "./skills/variants/qc-vcf-callset",
+        "./skills/variants/write-variant-tables"
+      ]
+    },
+    {
+      "name": "literature",
+      "description": "Scientific literature: recovering, verifying and assembling full-text paper corpora for review and retrieval.",
+      "source": "./",
+      "strict": false,
+      "category": "science",
+      "keywords": [
+        "literature",
+        "pubmed",
+        "full-text",
+        "corpus"
+      ],
+      "author": {
+        "name": "Ziyao Ma"
+      },
+      "license": "MIT",
+      "homepage": "https://lijinbio.github.io/aiscientist-skills/",
+      "repository": "https://github.com/lijinbio/aiscientist-skills",
+      "skills": [
+        "./skills/literature/recover-paper-pdfs"
       ]
     }
   ]

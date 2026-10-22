@@ -8,6 +8,11 @@ All notable changes to this repository are documented here. The format follows
 
 ### Changed
 
+- `single-cell/qc-snrna-with-cellqc-standalone` 1.1.0: Python pinned to `>=3.12,<3.14` in the
+  install command, a container route (a pinned apptainer image built without root), when to use
+  it and when not, and how it runs inside AiScientist (`image`, `cpus`, `mem_gb`, `time_limit` in
+  `metadata`, read by AiScientist's `run_in_environment`). The `r-doubletfinder` note says that
+  bioconda `cellqc` 0.3.6 depends on it from build 1.
 - The `aiscientist-skill` tooling no longer assumes uv. It installs with `pip install -e '.[dev]'`,
   pipx, uv or conda, the docs show the bare command, the pre-commit hook runs whatever
   `aiscientist-skill` is on `PATH`, and CI adds an "Install with pip" job. `uv.lock` remains the
@@ -20,6 +25,33 @@ All notable changes to this repository are documented here. The format follows
 
 ### Added
 
+- Skills migrated from AiScientist's own `skills/` folder (RCHENLAB/AiScientist issue 30), each
+  1.0.0 and `community`, with `scripts/reference.py`, pytest tests on synthetic data (skipped where
+  the scientific packages are not installed) and a trigger eval. `metadata.aliases` keeps the
+  AiScientist name each one replaces.
+  - `single-cell/annotate-clusters-by-markers` (was `annotate_clusters_by_markers_v2`, which
+    superseded `annotate_clusters_by_markers`)
+  - `single-cell/compare-conditions-by-celltype` (was `condition_by_celltype`)
+  - `single-cell/compare-two-groups-with-scanpy` (was `pairwise_de`)
+  - `single-cell/crossvalidate-scgpt-vs-leiden` (was `crossvalidate_scgpt_vs_leiden`)
+  - `single-cell/prioritize-disease-genes-with-atlas` (was `atlas_disease_genes`)
+  - `single-cell/score-gene-signatures-with-scanpy` (was `score_signature`)
+  - `crispr-screens/compare-perturbations-to-control` (was `perturbation_de_vs_control`)
+  - `crispr-screens/filter-escapers-with-mixscape` (was `mixscape_escape_filter`); the pertpy call
+    now works on pertpy 1.4, where `labels` became `pert_key`
+  - `crispr-screens/rank-perturbations-by-edistance` (was `perturbation_edistance`); the docs no
+    longer say it equals pertpy's `edistance`, which uses plain Euclidean distances
+  - `variants/build-variant-db-with-tiledbvcf` (was `build_variant_db_tiledbvcf`); a re-run no
+    longer ingests every VCF again and doubles the records
+  - `variants/normalize-vcf-with-bcftools` (was `normalize_vcf`); splits multiallelic records
+    before atomizing, so a multiallelic SNP no longer turns into `*` records
+  - `variants/prioritize-clinical-variants` (was `clinical_variant_prioritization`)
+  - `variants/qc-vcf-callset` (was `vcf_qc_stats`); Het/Hom now reads het and hom-alt counts, and
+    the call rate counts hom-ref calls
+  - `variants/write-variant-tables` (was `variant_output_tables`)
+  - `literature/recover-paper-pdfs` (was `literature-corpus-recovery`), instruction only: the ladder of
+    legal sources, from open-access APIs to institutional access, and the eight checks of every PDF
+- Categories `crispr-screens`, `variants` and `literature` (plugin entries and CODEOWNERS lines).
 - `single-cell/qc-snrna-with-cellqc-standalone` 1.0.0 (core): CellQC cohort QC for 10x
   snRNA-seq with bash and conda only, tested with cellqc 0.3.6 (DoubletFinder 2.0.6,
   Snakemake 9.22.0, Python 3.12.14).

@@ -46,8 +46,9 @@ Automated gates do the routine checking, so human review can focus on the scienc
    `aiscientist-skill sync`.
 3. Merge to `main`, then tag: `git tag v0.2.0 && git push origin v0.2.0`.
 
-The release workflow validates the registry and publishes per-skill zips, `catalog.json` and
-`SHA256SUMS` as a GitHub release.
+The release workflow validates the registry and publishes three assets as a GitHub release: the
+bundle `aiscientist-skills-<version>.zip` (every skill at its catalog `path`), `catalog.json` and
+`SHA256SUMS`.
 
 ## Runtime responsibilities
 

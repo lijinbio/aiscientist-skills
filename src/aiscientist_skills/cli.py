@@ -121,7 +121,8 @@ def cmd_package(args, root: Path) -> int:
     out = Path(args.out).resolve()
     if out.exists():
         shutil.rmtree(out)
-    zips = package(skills, build_catalog(skills, update_marketplace(market, skills)), out)
+    catalog = build_catalog(skills, update_marketplace(market, skills))
+    zips = package(skills, catalog, out, per_skill=args.per_skill)
     for z in zips:
         print(f"wrote {z.relative_to(Path.cwd()) if z.is_relative_to(Path.cwd()) else z}")
     return 0
@@ -212,8 +213,13 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--base", default="origin/main", help="git ref to compare against")
     s.set_defaults(func=cmd_review)
 
-    s = sub.add_parser("package", help="build release zips, catalog.json and SHA256SUMS")
+    s = sub.add_parser("package", help="build the release bundle zip, catalog.json and SHA256SUMS")
     s.add_argument("--out", default="dist")
+    s.add_argument(
+        "--per-skill",
+        action="store_true",
+        help="also write one zip per skill, for uploading to the Claude apps",
+    )
     s.set_defaults(func=cmd_package)
 
     s = sub.add_parser("site", help="build the searchable catalog page")

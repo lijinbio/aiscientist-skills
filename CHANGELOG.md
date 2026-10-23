@@ -6,8 +6,13 @@ All notable changes to this repository are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-23
+
 ### Changed
 
+- Releases ship three assets instead of one zip per skill: `aiscientist-skills-<version>.zip`, with
+  every skill folder at its catalog `path`, plus `catalog.json` and `SHA256SUMS`.
+  `aiscientist-skill package --per-skill` still builds one zip per skill, for the Claude apps.
 - `single-cell/qc-snrna-with-cellqc-standalone` 1.2.0: ships its reference settings in
   `assets/cellqc-defaults.json` (gene sets per reference, the expected doublet rate per chemistry
   with the reaction capacity, and the default count filters), which AiScientist's `run_cellqc`

@@ -110,13 +110,28 @@ def test_package_is_reproducible(repo: Path, tmp_path: Path):
     out1, out2 = tmp_path / "a", tmp_path / "b"
     assert run(repo, "package", "--out", str(out1)) == 0
     assert run(repo, "package", "--out", str(out2)) == 0
-    [skill] = [s for s in load_skills(repo) if s.name == NAME]
-    z = out1 / f"{NAME}-{skill.version}.zip"
-    assert z.read_bytes() == (out2 / z.name).read_bytes()
-    assert "qc-snrna-with-cellqc-standalone/SKILL.md" in zipfile.ZipFile(z).namelist()
-    assert z.name in (out1 / "SHA256SUMS").read_text()
     catalog = json.loads((out1 / "catalog.json").read_text())
     assert [s["status"] for s in catalog["skills"] if s["name"] == NAME] == ["core"]
+    bundle = out1 / f"aiscientist-skills-{catalog['registry_version']}.zip"
+    assert sorted(p.name for p in out1.iterdir()) == sorted(
+        [bundle.name, "catalog.json", "SHA256SUMS"]
+    )
+    assert bundle.read_bytes() == (out2 / bundle.name).read_bytes()
+    names = zipfile.ZipFile(bundle).namelist()
+    for s in catalog["skills"]:
+        assert f"{s['path']}/SKILL.md" in names
+    assert f"{SKILL.rsplit('/', 1)[0]}/assets/cellqc-defaults.json" in names
+    sums = (out1 / "SHA256SUMS").read_text().split()
+    assert sums[1::2] == [bundle.name, "catalog.json"]
+
+
+def test_package_per_skill_zips(repo: Path, tmp_path: Path):
+    out = tmp_path / "a"
+    assert run(repo, "package", "--out", str(out), "--per-skill") == 0
+    [skill] = [s for s in load_skills(repo) if s.name == NAME]
+    z = out / f"{NAME}-{skill.version}.zip"
+    assert f"{NAME}/SKILL.md" in zipfile.ZipFile(z).namelist()
+    assert z.name in (out / "SHA256SUMS").read_text()
 
 
 def test_site_builds(repo: Path, tmp_path: Path):

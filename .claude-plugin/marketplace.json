@@ -110,6 +110,28 @@
         "./skills/literature/read-whole-corpus-with-claude",
         "./skills/literature/recover-paper-pdfs"
       ]
+    },
+    {
+      "name": "knowledge-graph",
+      "description": "Biomedical knowledge graphs: resolving entities, reading typed relationships with their evidence and provenance, and finding datasets to analyze.",
+      "source": "./",
+      "strict": false,
+      "category": "science",
+      "keywords": [
+        "knowledge-graph",
+        "biolink",
+        "ontology",
+        "gene-expression"
+      ],
+      "author": {
+        "name": "Jin Li"
+      },
+      "license": "MIT",
+      "homepage": "https://lijinbio.github.io/aiscientist-skills/",
+      "repository": "https://github.com/lijinbio/aiscientist-skills",
+      "skills": [
+        "./skills/knowledge-graph/answer-eye-questions-with-visionkb-kg"
+      ]
     }
   ]
 }

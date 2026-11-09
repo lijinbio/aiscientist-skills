@@ -43,6 +43,14 @@ Pooled CRISPR screens with a single-cell readout (Perturb-seq): escaping cells, 
 | [`filter-escapers-with-mixscape`](skills/crispr-screens/filter-escapers-with-mixscape/) | ⚪ community | 1.0.0 | Label and remove escaping cells in a pooled CRISPR screen with single-cell readout (Perturb-seq, CROP-seq) with Mixscape from pertpy, from a log-normalized AnnData with a guide or perturbation column and a non-targeting control to adata_mixscape.h5ad without the non-perturbed (NP) cells, plus the NP fraction of every perturbation. |
 | [`rank-perturbations-by-edistance`](skills/crispr-screens/rank-perturbations-by-edistance/) | ⚪ community | 1.0.0 | Rank the perturbations of a pooled CRISPR screen with single-cell readout (Perturb-seq, CROP-seq, CRISPRi or CRISPRa) by E-distance (energy distance) to the non-targeting control in PCA space, with a label-permutation test and Benjamini-Hochberg correction, from an AnnData with a guide or perturbation column to a ranked CSV, the list of hits to carry into differential expression, and an optional perturbation-by-perturbation distance matrix. |
 
+### knowledge-graph
+
+Biomedical knowledge graphs: resolving entities, reading typed relationships with their evidence and provenance, and finding datasets to analyze.
+
+| Skill | Status | Version | What it does |
+| --- | --- | --- | --- |
+| [`answer-eye-questions-with-visionkb-kg`](skills/knowledge-graph/answer-eye-questions-with-visionkb-kg/) | ⚪ community | 0.0.1 | Answer chat-style knowledge questions about eye genes, cell types, diseases and datasets from the VisionKB knowledge graph through its read-only HTTP API or the equivalent visionkb-kg MCP tools, citing the KG release and dataset versions. |
+
 ### literature
 
 Scientific literature: recovering, verifying and assembling full-text paper corpora for review and retrieval.

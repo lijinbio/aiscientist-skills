@@ -140,7 +140,7 @@
       "tested_with": "visionkb-api 0.1.1 (image digest sha256:5d956d03...), visionkb-deploy 0.1.1, KG release visionkb-2026.11.0, Neo4j 2026.10.1 Community, PostgreSQL 17.11, httpx 0.28.1, Python 3.13.18, curl 8.23.0, jq 1.8.2",
       "author": "Jin Li",
       "requirements": {
-        "compute": "none on the client: the four worked questions (roughly 100 HTTP requests, most of them evidence lookups) took 8-13 s wall (three runs) against a stack on the same node; the server stack used 4 GB Neo4j heap and 8 GB page cache",
+        "compute": "none on the client: the four worked questions (roughly 100 HTTP requests, most of them evidence lookups) took 8-18 s wall (four runs) against a stack on the same node; the server stack used 4 GB Neo4j heap and 8 GB page cache",
         "gpu": false,
         "scheduler": "none",
         "network": "runtime",
@@ -149,8 +149,8 @@
         ],
         "allowed_tools": ""
       },
-      "has_code": false,
-      "has_tests": false
+      "has_code": true,
+      "has_tests": true
     },
     {
       "name": "read-whole-corpus-with-claude",

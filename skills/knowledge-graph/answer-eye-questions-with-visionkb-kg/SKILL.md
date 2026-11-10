@@ -2,7 +2,7 @@
 name: answer-eye-questions-with-visionkb-kg
 description: Answer chat-style knowledge questions about eye genes, cell types, diseases and datasets from the VisionKB knowledge graph through its read-only HTTP API or the equivalent visionkb-kg MCP tools, citing the KG release and dataset versions. Resolves a gene or cell type to a CURIE, reads per-class and per-cell-type expression from the HECA atlas summaries, reads typed Biolink relationships with knowledge_level, sources and PMIDs, opens the evidence behind an edge, and finds atlases with ready bind records, keeping atlas observations apart from curated claims. Use for questions such as which retinal cell types express LRAT, which class has the highest RHO, which diseases and PMIDs are recorded for PRPF31, or which atlases contain RPE cells. Not for new analysis of cell-level data.
 license: MIT
-compatibility: Needs network access to a running VisionKB API (visionkb-api 0.1.1 or later, deployed with visionkb-deploy) and a read token in a file; Python 3.11+ with httpx, or curl and jq. No local compute, no atlas files, no scheduler.
+compatibility: Needs network access to a running VisionKB API (visionkb-api 0.1.1 or later, deployed with visionkb-deploy) and a read token in a file; Python 3.11+ with httpx (scripts/vkb_client.py), or curl and jq. No local compute, no atlas files, no scheduler.
 metadata:
   category: knowledge-graph
   version: "0.0.1"
@@ -10,7 +10,7 @@ metadata:
   author: "Jin Li"
   tags: "knowledge-graph, biolink, gene-expression, retina, eye, cell-atlas, disease-genes, provenance, rest-api, mcp"
   tested-with: "visionkb-api 0.1.1 (image digest sha256:5d956d03...), visionkb-deploy 0.1.1, KG release visionkb-2026.11.0, Neo4j 2026.10.1 Community, PostgreSQL 17.11, httpx 0.28.1, Python 3.13.18, curl 8.23.0, jq 1.8.2"
-  compute: "none on the client: the four worked questions (roughly 100 HTTP requests, most of them evidence lookups) took 8-13 s wall (three runs) against a stack on the same node; the server stack used 4 GB Neo4j heap and 8 GB page cache"
+  compute: "none on the client: the four worked questions (roughly 100 HTTP requests, most of them evidence lookups) took 8-18 s wall (four runs) against a stack on the same node; the server stack used 4 GB Neo4j heap and 8 GB page cache"
   requires-gpu: "false"
   scheduler: "none"
   requires-network: "runtime"
@@ -64,6 +64,7 @@ source "$(conda info --base)/etc/profile.d/conda.sh"
 conda activate visionkb_kgclient
 export VISIONKB_API_URL=http://127.0.0.1:8770/v1                 # your deployment
 export VISIONKB_API_TOKEN_FILE=/path/to/secrets/api_token_read   # one line: the read token
+export VKB_SKILL_SCRIPTS=/path/to/answer-eye-questions-with-visionkb-kg/scripts   # vkb_client.py
 ```
 
 The tested solve: Python 3.13.18, httpx 0.28.1, curl 8.23.0, jq 1.8.2 (conda-forge). With visionkb-deploy, `bin/visionkb init` writes the read
@@ -74,9 +75,27 @@ checks the stack. Never paste the token into code, logs or reports.
 
 Every call returns the same envelope:
 `{"status": "ok"|"error", "kg_release", "data", "page": {"limit", "offset", "total"} | null, "warnings", "error"}`.
-Lists default to 50 rows (max 200); page with `offset`. Errors are returned as envelopes, never as
-invented data. The helper below raises on `status: error`, prints `warnings`, keeps every
-envelope as JSON for the report, and resolves names only on an exact CURIE or symbol match:
+Lists default to 50 rows (max 200). Errors are returned as envelopes, never as invented data.
+
+**A page can hold fewer rows than `limit`.** The API trims every response to stay under about
+24,000 characters and then warns `<list>: returned N of M items to stay within 24000 characters;
+page with limit/offset`. Advance `offset` by the number of rows received (`len(data)`), never by
+`limit`, or the trimmed rows are skipped silently. [scripts/vkb_client.py](scripts/vkb_client.py)
+(httpx; its paging logic is tested in `tests/` against a fake API that trims every page) does
+this:
+
+| Function | Does |
+| --- | --- |
+| `KG(url, token_file)` | client with the bearer token read from the file |
+| `kg.get(path, **params)` | one call; raises on `status: error`, prints `warnings` |
+| `kg.get_all(path, **params)` | every row of a list endpoint, `offset += len(data)` until `page.total` |
+| `kg.evidence_all(edge_id)` | `/evidence/{edge_id}` with every StudyResult, paged the same way |
+| `kg.resolve(q, category)` | `search_entities`, exact CURIE or symbol match only, else `LookupError` |
+| `coverage(env[, rows])` | `complete: n of total`, `trimmed: n of total (...)`, `partial: ...` or `top n` (search) |
+
+Use `get_all` / `evidence_all` for anything you count or conclude from; when you keep a single
+page (a top-5 view), print `coverage(...)` with it so the answer says what it covers. The worked
+questions start with:
 
 ```python
 import json
@@ -84,47 +103,14 @@ import os
 import pathlib
 import sys
 
-import httpx
+sys.path.insert(0, os.environ["VKB_SKILL_SCRIPTS"])  # <skill folder>/scripts
+from vkb_client import KG, coverage
 
-API = os.environ["VISIONKB_API_URL"]  # e.g. http://127.0.0.1:8770/v1
-TOKEN = pathlib.Path(os.environ["VISIONKB_API_TOKEN_FILE"]).read_text().strip()
-kg = httpx.Client(base_url=API, headers={"Authorization": f"Bearer {TOKEN}"}, timeout=60)
+kg = KG(os.environ["VISIONKB_API_URL"], os.environ["VISIONKB_API_TOKEN_FILE"])
+get, get_all, resolve = kg.get, kg.get_all, kg.resolve
 OUT = pathlib.Path(sys.argv[1])  # every response envelope is kept here, for the report
 OUT.mkdir(parents=True, exist_ok=True)
 SEQ = [0]
-
-
-def get(path, **params):
-    """GET one endpoint; return the envelope. Raise on status=error; print warnings."""
-    r = kg.get(path, params=params)
-    env = r.json()
-    if env["status"] != "ok":
-        raise RuntimeError(f"{path} {r.status_code}: {env['error']}")
-    for w in env["warnings"]:
-        print("  warning:", w)
-    return env
-
-
-def get_all(path, **params):
-    """Page through a list endpoint (offset) until page.total rows are read."""
-    rows, offset = [], 0
-    while True:
-        env = get(path, offset=offset, **params)
-        rows += env["data"]
-        offset += len(env["data"])
-        if not env["data"] or offset >= (env["page"]["total"] or 0):
-            break
-    env["data"] = rows
-    return env
-
-
-def resolve(q, category="biolink:Gene"):
-    """search_entities, keeping only exact CURIE / symbol matches; fail loudly otherwise."""
-    env = get("/entities/search", q=q, category=category, limit=5)
-    exact = [h for h in env["data"] if h["match"] in ("exact_id", "exact_symbol")]
-    if len(exact) != 1:
-        raise LookupError(f"{q}: {len(exact)} exact matches in {env['kg_release']}: {env['data']}")
-    return exact[0]["id"], env
 
 
 def save(name, env):
@@ -147,6 +133,8 @@ curl -fsS -H "$H" "$VISIONKB_API_URL/atlas/expression?genes=LRAT&level=majorclas
 jq -c '{kg_release, ready: .data}' ready.json
 jq -c '.kg_release, (.data[] | {id, symbol, match})' search.json
 jq -c '.data[] | {dataset_id, dataset_version, group_label, pct_expressing, pseudobulk_cp10k}' atlas.json
+# one page only: say how much of the result it is (rows < limit can mean trimmed, see warnings)
+jq -c '{returned: (.data | length), page, warnings}' atlas.json
 # errors are envelopes too: no token -> 401; no anchor -> missing_anchor; absent predicate
 curl -sS -o /dev/null -w 'no token: HTTP %{http_code}\n' "$VISIONKB_API_URL/release"
 curl -sS -H "$H" "$VISIONKB_API_URL/relationships?predicate=biolink:expressed_in" | jq -c '{status, error}'
@@ -159,9 +147,9 @@ top three LRAT rows across all atlases were RPE groups of `ds-rpechoroid-scrna`,
 and `ds-rpechoroid-snrna`; no token gave HTTP 401; `/relationships` without an anchor gave
 `missing_anchor`.
 
-**Long lists are cut to stay under about 24,000 characters.** The API then returns fewer rows
-than `limit` and says so in a warning (`returned 57 of 132 items ...; page with limit/offset`).
-Use `get_all` (or `offset`) whenever `page.total` is larger than the rows you hold.
+The `{returned, page, warnings}` line is the same check for one curl page; here it gave
+`returned: 3` with `limit: 3`, `total: 132` and no warning, i.e. a partial page by `limit`, not a
+trimmed one.
 
 ## 3. What is in the graph, and what each field means
 
@@ -265,24 +253,25 @@ holds KI-1 (section 3).
 print(f"\n# Q1 {Q1_GENE}: expression by class and cell type")
 gene, hits = resolve(Q1_GENE)
 save("q1_search", hits)
+print("  search:", coverage(hits))
 show(hits["data"], ["id", "symbol", "name", "match"])
 
 edges = get_all("/relationships", subject=gene, predicate="biolink:expressed_in", limit=200)
 save("q1_expressed_in_edges", edges)
-print(f"  expressed_in edges: {edges['page']['total']} (all atlases)")
+print("  expressed_in edges (all atlases):", coverage(edges))
 for e in edges["data"][:8]:
     print("   ", e["object"]["id"], e["object"]["name"], e["qualifiers"], e["summary"])
 # an edge aggregates atlases: its StudyResults say which (dataset, level, group) support it
 edge_groups = set()
 for e in edges["data"]:
-    for sr in get(f"/evidence/{e['edge_id']}", limit=200)["data"]["study_results"]:
+    for sr in kg.evidence_all(e["edge_id"], limit=200)["data"]["study_results"]:
         edge_groups.add((sr["dataset_id"], sr["level"], sr["group_label"]))
 
 for level in ("majorclass", "celltype"):
     ex = get_all("/atlas/expression", genes=gene, dataset=Q1_DATASET, level=level, limit=200)
     save(f"q1_atlas_{level}", ex)
     top_cp10k = ex["data"][0]["pseudobulk_cp10k"]  # rows are sorted by pseudobulk_cp10k
-    print(f"  atlas {level}: {ex['page']['total']} rows; rule a/b/c as in D18")
+    print(f"  atlas {level}:", coverage(ex), "| rule a/b/c as in D18")
     for r in ex["data"][:5]:
         a = r["pct_expressing"] >= 0.10 and r["n_cells"] >= 20
         b = r["pseudobulk_cp10k"] >= 0.10 * top_cp10k
@@ -296,15 +285,16 @@ for level in ("majorclass", "celltype"):
 
 reg = get("/atlas/expression", genes=gene, dataset=Q1_DATASET, level="region_majorclass", limit=5)
 save("q1_atlas_region_majorclass", reg)
-print(f"  atlas region_majorclass (Parquet only, no KG edges): total rows {reg['page']['total']}")
+print("  atlas region_majorclass (Parquet only, no KG edges):", coverage(reg))
 show(reg["data"], ["group_label", "region", "pct_expressing", "pseudobulk_cp10k"])
 
 if edges["data"]:
-    ev = get(f"/evidence/{edges['data'][0]['edge_id']}", limit=10)
+    ev = get(f"/evidence/{edges['data'][0]['edge_id']}", limit=10)  # first page only
     save("q1_evidence_top_edge", ev)
-    print("  evidence:", ev["data"]["edge"]["object"]["id"], ev["page"]["total"], "study results")
+    srs = ev["data"]["study_results"]
+    print("  evidence:", ev["data"]["edge"]["object"]["id"], coverage(ev, srs))
     cols = ["dataset_id", "atlas_version", "level", "group_label", "n_donors_expressing", "method"]
-    show(ev["data"]["study_results"], cols)
+    show(srs, cols)
 ```
 
 What the run showed (HRCA snRNA, 3,177,310 nuclei, `heca-2026.05`):
@@ -320,7 +310,7 @@ What the run showed (HRCA snRNA, 3,177,310 nuclei, `heca-2026.05`):
   detected**. Report it as low-level detection, not as absence.
 - Cell type: amacrine subtype HAC39 has about 24 % of nuclei expressing and 73 donors, so it
   passes a and c, but fails b (under 10 % of the RPE pseudobulk): no edge.
-- Region x major class: 30 rows, only in the Parquet (RPE pseudobulk is similar in fovea, macula and
+- Region x major class: 30 rows (the code keeps the top 5 and says `partial: 5 of 30`), only in the Parquet (RPE pseudobulk is similar in fovea, macula and
   periphery). There are no regional edges to query.
 - The evidence of the top RPE edge lists three StudyResults, each with dataset, atlas version,
   level, group and the D18 `method` string.
@@ -346,12 +336,14 @@ for ds, rows in by_ds.items():
 # (doublets or ambient RNA), not expression. Known issue KI-1 of visionkb-2026.11.0.
 rho_edges = get_all("/relationships", subject=rho, predicate="biolink:expressed_in", limit=200)
 save("q2_expressed_in_edges", rho_edges)
-print(f"  expressed_in edges for {Q2_GENE}: {rho_edges['page']['total']}")
+print(f"  expressed_in edges for {Q2_GENE}:", coverage(rho_edges))
 for e in rho_edges["data"]:
     o = e["object"]["id"]
-    parents = get("/relationships", subject=o, predicate="biolink:subclass_of", limit=10)["data"]
+    parents = get_all("/relationships", subject=o, predicate="biolink:subclass_of", limit=50)[
+        "data"
+    ]
     parent_ids = [x["object"]["id"] for x in parents]
-    for sr in get(f"/evidence/{e['edge_id']}", limit=200)["data"]["study_results"]:
+    for sr in kg.evidence_all(e["edge_id"], limit=200)["data"]["study_results"]:
         tc = top_class[sr["dataset_id"]]
         flag = "" if tc in (o, *parent_ids) else "  <- not the top class: check"
         print(
@@ -402,21 +394,25 @@ for e in allrel["data"]:
     levels[k] = levels.get(k, 0) + 1
 for k, n in sorted(levels.items()):
     print("  ", *k, n)
-dis = get("/relationships", subject=g3, object_category="biolink:Disease", limit=50)
+dis = get_all("/relationships", subject=g3, object_category="biolink:Disease", limit=50)
 save("q3_disease_edges", dis)
-print(f"  edges to diseases: {dis['page']['total']}")
+print("  edges to diseases:", coverage(dis))
 for e in dis["data"]:
     o = e["object"]
     print("   ", e["predicate"], o["id"], o["name"], e["knowledge_level"], e["agent_type"])
-    print("     ", e["primary_knowledge_source"], e["publications"])
+    pubs = e["publications"]  # at most 5 here; n_publications is the full count
+    print("     ", e["primary_knowledge_source"], pubs, f"({len(pubs)} of {e['n_publications']})")
 if dis["data"]:
-    ev3 = get(f"/evidence/{dis['data'][0]['edge_id']}")
+    ev3 = kg.evidence_all(dis["data"][0]["edge_id"], limit=200)
     save("q3_evidence", ev3)
+    print("  evidence:", coverage(ev3, ev3["data"]["study_results"]))
     print("  publications:", ev3["data"]["publications"])
     show(ev3["data"]["study_results"], ["id", "pmid", "grade"])
-    gs = get("/gene-sets", entity=dis["data"][0]["object"]["id"], kind="disease_genes", limit=20)
+    gs = get_all(
+        "/gene-sets", entity=dis["data"][0]["object"]["id"], kind="disease_genes", limit=50
+    )
     save("q3_gene_set_disease", gs)
-    print(f"  genes associated with {dis['data'][0]['object']['id']}: {gs['page']['total']}")
+    print(f"  genes associated with {dis['data'][0]['object']['id']}:", coverage(gs))
     show(gs["data"], ["gene_id", "symbol", "score"])
 ```
 
@@ -443,15 +439,16 @@ for HPO) rather than one predicate, since the curated predicates differ by claim
 print("\n# Q4 datasets with bind records")
 rpe = get("/entities/search", q="retinal pigment epithelial cell", category="biolink:Cell", limit=3)
 save("q4_search_rpe", rpe)
+print("  search:", coverage(rpe))
 show(rpe["data"], ["id", "name", "match"])
 rpe_id = next(h["id"] for h in rpe["data"] if h["name"] == "retinal pigment epithelial cell")
 for label, params in (
     ("rpe_cells", {"entities": rpe_id}),
     ("retina", {"tissue": "UBERON:0000966"}),
 ):
-    ds = get("/datasets", limit=20, **params)
+    ds = get_all("/datasets", limit=50, **params)
     save(f"q4_datasets_{label}", ds)
-    print(f"  {label}: {ds['page']['total']} datasets")
+    print(f"  {label} datasets:", coverage(ds))
     for d in ds["data"]:
         bind = {k: v for k, v in d["bind"].items() if k != "path"}  # path = HPC-side h5ad path
         print("   ", d["id"], d["version"], d["assay"], d["n_cells"], d["access_level"], bind)

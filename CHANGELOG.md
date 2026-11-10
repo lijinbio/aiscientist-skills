@@ -14,8 +14,10 @@ All notable changes to this repository are documented here. The format follows
   summaries, typed Biolink relationships with `knowledge_level`, evidence, datasets with bind
   records), and names the equivalent `visionkb-kg` MCP tools. It states the expression-edge rule,
   the ambient-RNA and doublet caveats (known issue KI-1) and that a missing edge is not evidence of
-  non-expression. Tested on the KG release `visionkb-2026.11.0` served by visionkb-api 0.1.1. It
-  comes with the trigger eval `ask-eye-knowledge-graph-expression-and-disease`.
+  non-expression. `scripts/vkb_client.py` pages by rows received (the API trims pages to its
+  character cap) and labels single pages `complete`, `partial` or `trimmed: n of total`, with tests
+  against a fake trimming API. Tested on the KG release `visionkb-2026.11.0` served by
+  visionkb-api 0.1.1. It comes with the trigger eval `ask-eye-knowledge-graph-expression-and-disease`.
 - `literature/read-whole-corpus-with-claude` 0.0.1: answers a question from a chunked full-text
   corpus by having Claude Haiku read every passage, ten per call, as numbered sentences, and keep
   the sentences that bear on it (verbatim, with PMID and page). `scripts/read_corpus.py` estimates

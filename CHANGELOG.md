@@ -6,6 +6,8 @@ All notable changes to this repository are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-10
+
 ### Added
 
 - `knowledge-graph/answer-eye-questions-with-visionkb-kg` 0.0.1, instruction only, and the

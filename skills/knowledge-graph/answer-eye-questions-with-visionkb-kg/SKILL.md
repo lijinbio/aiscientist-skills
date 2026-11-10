@@ -9,8 +9,8 @@ metadata:
   status: community
   author: "Jin Li"
   tags: "knowledge-graph, biolink, gene-expression, retina, eye, cell-atlas, disease-genes, provenance, rest-api, mcp"
-  tested-with: "TBD (pending the run on the real release)"
-  compute: "TBD (pending the run on the real release)"
+  tested-with: "visionkb-api 0.1.1 (image digest sha256:5d956d03...), visionkb-deploy 0.1.1, KG release visionkb-2026.11.0, Neo4j 2026.10.1 Community, PostgreSQL 17.11, httpx 0.28.1, Python 3.13.18, curl 8.23.0, jq 1.8.2"
+  compute: "none on the client: the four worked questions (roughly 100 HTTP requests, most of them evidence lookups) took 8-13 s wall (three runs) against a stack on the same node; the server stack used 4 GB Neo4j heap and 8 GB page cache"
   requires-gpu: "false"
   scheduler: "none"
   requires-network: "runtime"
@@ -32,7 +32,10 @@ jobs. Every response carries `kg_release`; every expression row carries `dataset
 `dataset_version`. Cite both.
 
 Tested end to end, as written, against a stack deployed with visionkb-deploy 0.1.1 on an HPC
-compute node, serving the first real release TBD (pending the run on the real release).
+compute node, serving the first real release `visionkb-2026.11.0` (Biolink 4.4.6; 2,783,649 nodes; 2,359,657 `expressed_in` edges with
+2,758,076 StudyResults from the 13 HECA atlases at `heca-2026.05`; 22 curated gene-disease or
+gene-phenotype edges). The outputs quoted below are from that run; the HECA datasets are
+`access_level: lab`, so only the values needed to read the example are shown, rounded.
 
 Replace every `/path/to/...` with your own values.
 
@@ -40,10 +43,10 @@ Replace every `/path/to/...` with your own values.
 
 - "Which cell types / major classes express gene X, how strongly, with how many donors?"
 - "Which class has the highest X?" (ranked atlas summaries).
-- "What is known about gene X and disease Y, with PMIDs?" (curated `gene_associated_with_condition`).
+- "What is known about gene X and disease Y, with PMIDs?" (curated `causes` / `gene_associated_with_condition`).
 - "Which genes are associated with disease Y?", "Which genes are expressed in cell type Z?" (gene sets).
 - "Which atlases contain RPE cells / are from retina, and how do I attach one?" (registry + bind record).
-- Before a Route B/C analysis: pick the dataset and prior evidence to compare against.
+- Before an analysis of a bound atlas: pick the dataset and the prior evidence to compare against.
 
 ## When NOT to use
 
@@ -51,7 +54,7 @@ Replace every `/path/to/...` with your own values.
   the atlas the registry returns and run the analysis tools; the KG holds summaries only.
 - Region-specific claims from the graph: region x class numbers exist only in the atlas summary
   table (`level=region_majorclass`), never as edges.
-- Perturbation results and cell-state comparisons: not in release v0.1 (the API does not expose them).
+- Perturbation results and cell-state comparisons: not in the 0.1 API (not exposed).
 
 ## 1. Environment
 
@@ -63,7 +66,7 @@ export VISIONKB_API_URL=http://127.0.0.1:8770/v1                 # your deployme
 export VISIONKB_API_TOKEN_FILE=/path/to/secrets/api_token_read   # one line: the read token
 ```
 
-The tested solve: TBD (pending the run on the real release). With visionkb-deploy, `bin/visionkb init` writes the read
+The tested solve: Python 3.13.18, httpx 0.28.1, curl 8.23.0, jq 1.8.2 (conda-forge). With visionkb-deploy, `bin/visionkb init` writes the read
 token to `<deploy dir>/<instance>/secrets/api_token_read` (mode 600) and `bin/visionkb health`
 checks the stack. Never paste the token into code, logs or reports.
 
@@ -102,6 +105,19 @@ def get(path, **params):
     return env
 
 
+def get_all(path, **params):
+    """Page through a list endpoint (offset) until page.total rows are read."""
+    rows, offset = [], 0
+    while True:
+        env = get(path, offset=offset, **params)
+        rows += env["data"]
+        offset += len(env["data"])
+        if not env["data"] or offset >= (env["page"]["total"] or 0):
+            break
+    env["data"] = rows
+    return env
+
+
 def resolve(q, category="biolink:Gene"):
     """search_entities, keeping only exact CURIE / symbol matches; fail loudly otherwise."""
     env = get("/entities/search", q=q, category=category, limit=5)
@@ -131,30 +147,41 @@ curl -fsS -H "$H" "$VISIONKB_API_URL/atlas/expression?genes=LRAT&level=majorclas
 jq -c '{kg_release, ready: .data}' ready.json
 jq -c '.kg_release, (.data[] | {id, symbol, match})' search.json
 jq -c '.data[] | {dataset_id, dataset_version, group_label, pct_expressing, pseudobulk_cp10k}' atlas.json
-# errors are envelopes too: no token -> 401; no subject/object -> 400 missing_anchor
+# errors are envelopes too: no token -> 401; no anchor -> missing_anchor; absent predicate
 curl -sS -o /dev/null -w 'no token: HTTP %{http_code}\n' "$VISIONKB_API_URL/release"
 curl -sS -H "$H" "$VISIONKB_API_URL/relationships?predicate=biolink:expressed_in" | jq -c '{status, error}'
+curl -sS -H "$H" "$VISIONKB_API_URL/relationships?subject=HGNC:6685&predicate=biolink:treats" | jq -c '.error'
 ```
 
-TBD (pending the run on the real release)
+What came back: `ready` with `neo4j`, `summaries` and `postgres` all `ok` and the release id;
+`LRAT` resolved to `HGNC:6685` (`exact_symbol`) with `LRATD1` and `LRATD2` as `fulltext` hits; the
+top three LRAT rows across all atlases were RPE groups of `ds-rpechoroid-scrna`, `ds-hrca-snrna`
+and `ds-rpechoroid-snrna`; no token gave HTTP 401; `/relationships` without an anchor gave
+`missing_anchor`.
+
+**Long lists are cut to stay under about 24,000 characters.** The API then returns fewer rows
+than `limit` and says so in a warning (`returned 57 of 132 items ...; page with limit/offset`).
+Use `get_all` (or `offset`) whenever `page.total` is larger than the rows you hold.
 
 ## 3. What is in the graph, and what each field means
 
 | Source | Edges | `knowledge_level` | `agent_type` | `primary_knowledge_source` |
 | --- | --- | --- | --- | --- |
 | HECA atlas summaries | `expressed_in` (gene -> cell type or state) | `observation` | `data_analysis_pipeline` | `infores:visionkb-heca` |
-| RetiGene curated review | `gene_associated_with_condition` (gene -> disease) | `knowledge_assertion` | `manual_validation_of_automated_agent` | `infores:visionkb-retigene` |
+| RetiGene curated haploinsufficiency review | `causes`, `gene_associated_with_condition` (gene -> disease), `has_phenotype` (gene -> HPO) | `knowledge_assertion` | `manual_validation_of_automated_agent` | `infores:visionkb-retigene` |
 | CL, UBERON, MONDO, HPO | `subclass_of`, `part_of` | `knowledge_assertion` | `manual_agent` | `infores:cl`, ... |
 
 `knowledge_level` is what keeps observations apart from claims: an `expressed_in` edge says "this
 transcript was measured in these cells of this atlas", nothing about function; a
-`gene_associated_with_condition` edge is a curated statement backed by publications. Filter with
+`causes` or `gene_associated_with_condition` edge is a curated statement backed by publications
+(with a curator `grade` per StudyResult). Filter with
 `knowledge_level=` on `/relationships` and report the two kinds in separate paragraphs.
 
 **Evidence.** Each edge lists `has_study_results`; `GET /evidence/{edge_id}` returns them. For
 expression, one StudyResult per (dataset, level, group) with `n_cells`, `n_donors`,
 `pct_expressing`, `mean_log1p_cp10k`, `pseudobulk_cp10k`, `n_donors_expressing`, `method`; for
-curated claims, `pmid`, `grade`, `review_note` and a short `supporting_text`.
+curated claims, `pmid`, `page`, `evidence_kind`, `grade` and a short `supporting_text` (lab
+curation: do not quote it outside the lab).
 
 **What makes an `expressed_in` edge (VisionKB decision D18).** A (gene, dataset, group) becomes an
 edge, with a StudyResult, only if all of these hold:
@@ -163,7 +190,8 @@ edge, with a StudyResult, only if all of these hold:
 2. `pseudobulk_cp10k >= 0.10 x` the gene's maximum over the groups of the same dataset and level
    (specificity: removes low-level spill-over of very abundant transcripts);
 3. `n_donors_expressing >= 2` (a donor counts when >= 10 % of its cells in the group express the
-   gene). Atlases without donor labels use 1-2 only and their edges are flagged.
+   gene). Atlases without donor labels would use 1-2 only, with flagged edges; all 13 atlases of
+   `visionkb-2026.11.0` have donor labels.
 
 Edges exist at two levels, `majorclass` and `celltype` (CL class, or a `visionkb:cs-<dataset>-<label>`
 CellState that is `subclass_of` a CL class). **Region x major class numbers are only in the
@@ -173,16 +201,23 @@ Parquet summaries** (`/atlas/expression?level=region_majorclass`); there are no 
 the rule above. Before saying "X is not expressed in Z", read the atlas rows
 (`/atlas/expression`, all genes x groups, no threshold) and report `pct_expressing`,
 `pseudobulk_cp10k` and donor support. Also check that the gene and group exist in that dataset:
-a gene missing from the summaries comes back with a warning, not with zeros.
+a gene missing from the summaries comes back as no rows plus the warning
+`<gene>: not found in the expression summaries`, not as zeros.
 
-**Ambient RNA in snRNA.** Very highly expressed transcripts (rod genes such as RHO, also
-GNAT1, PDE6 and SAG) are detected at low levels in many non-expressing nuclei. A
-`pct_expressing` of 0.05-0.3 for a rod gene in Müller glia, amacrine or bipolar nuclei is
-usually contamination, not expression. Rule 2 removes most of these edges, but the atlas rows
-still show them. Treat such rows as contamination unless the gene is also specific there in an
-scRNA atlas or in another tissue, and say so.
+**Ambient RNA in snRNA.** Very abundant transcripts leak into other nuclei. In the HRCA snRNA
+atlas, RHO is detected in 17-28 % of amacrine, bipolar, cone and Müller-glia nuclei at 3-9 % of
+the rod pseudobulk (section 4.2). Rule 2 removes those edges, but the atlas rows still show
+them: a rod gene at 0.1-0.3 `pct_expressing` in a non-rod class is contamination until shown
+otherwise (for example by specific expression in an scRNA atlas or by another method). Say so
+whenever you report such a row.
 
-## 4. A Route A answer in at most six calls
+**Doublet programs in small subtypes (known issue KI-1).** Small subtypes of one class can carry
+the program of another, abundant class (rod genes in amacrine subtypes in `visionkb-2026.11.0`).
+Those groups pass all three rules and get edges. For a gene that marks one major class strongly,
+read the major-class rows first and treat edges to small subtypes of a different class as
+possible contamination (section 4.2 shows how to check every edge).
+
+## 4. A knowledge answer (Route A) in about six calls
 
 1. `GET /release`: `kg_release`, atlases and versions, predicates present.
 2. `GET /entities/search?q=...`: exact CURIE / symbol match only (synonym or full-text hits need
@@ -208,17 +243,21 @@ rel = get("/release")
 save("release", rel)
 print("kg_release:", rel["kg_release"], "| biolink", rel["data"]["biolink_version"])
 print("predicates:", rel["data"].get("predicates_in_graph"))
-print(
-    "known issues:",
-    [(k["id"], k["title"], k["status"]) for k in rel["data"].get("known_issues", [])],
-)
+print("edges by predicate:", rel["data"]["counts"]["edges_by_predicate"])
 for a in rel["data"]["atlases"]:
     print("  atlas", a["dataset_id"], a["atlas_version"])
 expect = os.environ.get("VISIONKB_EXPECT_RELEASE")
 assert expect is None or rel["kg_release"] == expect, (rel["kg_release"], expect)
 ```
 
-TBD (pending the run on the real release)
+The run printed `visionkb-2026.11.0`, the six predicates present (`causes`, `expressed_in`,
+`gene_associated_with_condition`, `has_phenotype`, `part_of`, `subclass_of`), the edge counts per
+predicate and the 13 atlases, all at `heca-2026.05`.
+
+**Known issues are not in `/release`.** visionkb-api 0.1.1 does not return the manifest's
+`known_issues`; read `validation/known_issues.json` (or the Known issues section of
+`validation/report.md`) of the release bundle, or ask the operator. For `visionkb-2026.11.0` it
+holds KI-1 (section 3).
 
 ### 4.1 In which classes and cell types is LRAT expressed? (expression, observation)
 
@@ -228,108 +267,134 @@ gene, hits = resolve(Q1_GENE)
 save("q1_search", hits)
 show(hits["data"], ["id", "symbol", "name", "match"])
 
+edges = get_all("/relationships", subject=gene, predicate="biolink:expressed_in", limit=200)
+save("q1_expressed_in_edges", edges)
+print(f"  expressed_in edges: {edges['page']['total']} (all atlases)")
+for e in edges["data"][:8]:
+    print("   ", e["object"]["id"], e["object"]["name"], e["qualifiers"], e["summary"])
+# an edge aggregates atlases: its StudyResults say which (dataset, level, group) support it
+edge_groups = set()
+for e in edges["data"]:
+    for sr in get(f"/evidence/{e['edge_id']}", limit=200)["data"]["study_results"]:
+        edge_groups.add((sr["dataset_id"], sr["level"], sr["group_label"]))
+
 for level in ("majorclass", "celltype"):
-    ex = get("/atlas/expression", genes=gene, dataset=Q1_DATASET, level=level, limit=5)
+    ex = get_all("/atlas/expression", genes=gene, dataset=Q1_DATASET, level=level, limit=200)
     save(f"q1_atlas_{level}", ex)
-    print(f"  atlas {level}: total rows {ex['page']['total']}")
-    show(
-        ex["data"],
-        [
-            "group_label",
-            "cell_type_id",
-            "pct_expressing",
-            "pseudobulk_cp10k",
-            "n_donors_expressing",
-            "n_donors",
-        ],
-    )
+    top_cp10k = ex["data"][0]["pseudobulk_cp10k"]  # rows are sorted by pseudobulk_cp10k
+    print(f"  atlas {level}: {ex['page']['total']} rows; rule a/b/c as in D18")
+    for r in ex["data"][:5]:
+        a = r["pct_expressing"] >= 0.10 and r["n_cells"] >= 20
+        b = r["pseudobulk_cp10k"] >= 0.10 * top_cp10k
+        c = r["n_donors_expressing"] >= 2
+        print(
+            f"   {r['group_label']} {r['cell_type_id']} n_cells={r['n_cells']} "
+            f"pct={r['pct_expressing']} cp10k={r['pseudobulk_cp10k']} "
+            f"donors={r['n_donors_expressing']}/{r['n_donors']} a={a} b={b} c={c} "
+            f"edge={(Q1_DATASET, level, r['group_label']) in edge_groups}"
+        )
 
 reg = get("/atlas/expression", genes=gene, dataset=Q1_DATASET, level="region_majorclass", limit=5)
 save("q1_atlas_region_majorclass", reg)
 print(f"  atlas region_majorclass (Parquet only, no KG edges): total rows {reg['page']['total']}")
-show(
-    reg["data"],
-    ["group_label", "region", "pct_expressing", "pseudobulk_cp10k", "n_donors_expressing"],
-)
-
-edges = get("/relationships", subject=gene, predicate="biolink:expressed_in", limit=50)
-save("q1_expressed_in_edges", edges)
-print(f"  expressed_in edges: {edges['page']['total']}")
-show(edges["data"][:10], ["edge_id", "knowledge_level"])
-for e in edges["data"][:10]:
-    print("   ", e["object"]["id"], e["object"]["name"], e["summary"])
+show(reg["data"], ["group_label", "region", "pct_expressing", "pseudobulk_cp10k"])
 
 if edges["data"]:
     ev = get(f"/evidence/{edges['data'][0]['edge_id']}", limit=10)
     save("q1_evidence_top_edge", ev)
-    print(
-        "  evidence for", ev["data"]["edge"]["object"]["id"], "study_results:", ev["page"]["total"]
-    )
-    show(
-        ev["data"]["study_results"],
-        [
-            "dataset_id",
-            "atlas_version",
-            "level",
-            "group_label",
-            "pct_expressing",
-            "n_donors_expressing",
-            "method",
-        ],
-    )
+    print("  evidence:", ev["data"]["edge"]["object"]["id"], ev["page"]["total"], "study results")
+    cols = ["dataset_id", "atlas_version", "level", "group_label", "n_donors_expressing", "method"]
+    show(ev["data"]["study_results"], cols)
 ```
 
-TBD (pending the run on the real release)
+What the run showed (HRCA snRNA, 3,177,310 nuclei, `heca-2026.05`):
+
+- `LRAT` -> `HGNC:6685` (`exact_symbol`). 28 `expressed_in` edges over all atlases: RPE (CL and
+  dataset-specific RPE states), melanocytes, Schwann cells and one reactive Müller-glia state
+  (`MG_reactive`). Edges
+  to the same cell type with different `anatomical_context_qualifier` (retina vs RPE/choroid) are
+  separate edges.
+- Major class: RPE is the top group (about three quarters of nuclei, 23 of 24 donors); it passes
+  rules a, b and c and has an edge. Müller glia come second at about 7 % of nuclei and 4 % of the
+  RPE pseudobulk, with 21 of 100 donors: rules a and b fail, so **no edge, but the gene is
+  detected**. Report it as low-level detection, not as absence.
+- Cell type: amacrine subtype HAC39 has about 24 % of nuclei expressing and 73 donors, so it
+  passes a and c, but fails b (under 10 % of the RPE pseudobulk): no edge.
+- Region x major class: 30 rows, only in the Parquet (RPE pseudobulk is similar in fovea, macula and
+  periphery). There are no regional edges to query.
+- The evidence of the top RPE edge lists three StudyResults, each with dataset, atlas version,
+  level, group and the D18 `method` string.
 
 ### 4.2 Which major class shows the highest RHO? (ranking, ambient RNA)
 
 ```python
-print(f"\n# Q2 {Q2_GENE}: top major class, then the cell-type edges checked against it")
+print(f"\n# Q2 {Q2_GENE}: top major class per atlas, then every edge checked against it")
 rho, _ = resolve(Q2_GENE)
-top = get("/atlas/expression", genes=rho, level="majorclass", sort="pseudobulk_cp10k", limit=200)
+top = get_all("/atlas/expression", genes=rho, level="majorclass", limit=200)
 save("q2_atlas_majorclass_all_datasets", top)
 by_ds = {}
-for r in top["data"]:
+for r in top["data"]:  # sorted by pseudobulk_cp10k over all atlases
     by_ds.setdefault(r["dataset_id"], []).append(r)
+top_class = {ds: rows[0]["cell_type_id"] for ds, rows in by_ds.items()}
 for ds, rows in by_ds.items():
-    print(f"  {ds} {rows[0]['dataset_version']}: top {rows[0]['group_label']}")
-    show(rows[:3], ["group_label", "cell_type_id", "pct_expressing", "pseudobulk_cp10k"])
     detected = [r["group_label"] for r in rows if r["pct_expressing"] >= 0.10]
-    print(f"    groups with pct>=0.10: {detected}")
+    print(f"  {ds}: top {rows[0]['group_label']}; groups with pct>=0.10: {detected}")
+    show(rows[:3], ["group_label", "n_cells", "pct_expressing", "pseudobulk_cp10k"])
 
-# majorclass first, then the cell-type edges: an edge to a small subtype of ANOTHER class is
-# possible contamination (ambient RNA or doublets), not expression
-ct = get("/atlas/expression", genes=rho, dataset=Q1_DATASET, level="celltype", limit=200)
-save("q2_atlas_celltype", ct)
-rows_at = {
-    "majorclass": {r["cell_type_id"]: r for r in by_ds[Q1_DATASET]},
-    "celltype": {r["cell_type_id"]: r for r in ct["data"]},
-}
-rho_edges = get("/relationships", subject=rho, predicate="biolink:expressed_in", limit=200)
+# Majorclass first, then each edge's StudyResults: support from a group of ANOTHER class than the
+# atlas's top class (a small subtype, or a non-rod class in snRNA) is possible contamination
+# (doublets or ambient RNA), not expression. Known issue KI-1 of visionkb-2026.11.0.
+rho_edges = get_all("/relationships", subject=rho, predicate="biolink:expressed_in", limit=200)
 save("q2_expressed_in_edges", rho_edges)
 print(f"  expressed_in edges for {Q2_GENE}: {rho_edges['page']['total']}")
-top_class = by_ds[Q1_DATASET][0]["cell_type_id"]  # e.g. CL:0000604 retinal rod cell
 for e in rho_edges["data"]:
     o = e["object"]["id"]
     parents = get("/relationships", subject=o, predicate="biolink:subclass_of", limit=10)["data"]
     parent_ids = [x["object"]["id"] for x in parents]
-    lvl = "majorclass" if o in rows_at["majorclass"] else "celltype"
-    r = rows_at[lvl].get(o, {})
-    flag = "" if o == top_class or top_class in parent_ids else "  <- other class: check"
-    print(
-        f"   {o} {e['object']['name']} parent={parent_ids} {lvl} n_cells={r.get('n_cells')} "
-        f"pct={r.get('pct_expressing')} cp10k={r.get('pseudobulk_cp10k')}{flag}"
-    )
+    for sr in get(f"/evidence/{e['edge_id']}", limit=200)["data"]["study_results"]:
+        tc = top_class[sr["dataset_id"]]
+        flag = "" if tc in (o, *parent_ids) else "  <- not the top class: check"
+        print(
+            f"   {o} ({e['object']['name']}) parent={parent_ids} | {sr['dataset_id']} "
+            f"{sr['level']} "
+            f"{sr['group_label']} n_cells={sr['n_cells']} pct={sr['pct_expressing']} "
+            f"cp10k={sr['pseudobulk_cp10k']} donors={sr['n_donors_expressing']}{flag}"
+        )
 ```
 
-TBD (pending the run on the real release)
+What the run showed:
+
+- Major class: Rod is the top class in both HRCA atlases (snRNA: about 91 % of 1,066,056 rod
+  nuclei, 103 donors). In HRCA snRNA, RHO is also detected in at least 10 % of nuclei of **every**
+  other major class (AC 17 %, BC, Cone and MG 26-28 %) at 3-9 % of the rod pseudobulk, which is
+  the ambient-RNA signature; rule b removes those major-class edges. Microglia, astrocyte and RPE
+  sit just above the threshold (10-12 % of the rod level) and keep edges: treat them as
+  unresolved (ambient RNA, or phagocytosed outer segments) unless another atlas or method
+  supports them.
+- 20 edges in total. Besides Rod: 14 amacrine subtypes of HRCA snRNA (39 to 1,057 nuclei each)
+  with 40-84 % of nuclei expressing at 11-28 % of the rod pseudobulk, and the bipolar type OFFx.
+  Twelve of those subtypes plus SEG* are exactly the 13 rod-program groups of **KI-1**; VG3* and
+  OFFx are not listed there but follow the same pattern.
+- ONONH snRNA has no rods; its top class for RHO is MG at about 10 % of nuclei and 0.3 CP10k, so
+  the within-atlas rule keeps an edge there. Compare with the gene's home class in other atlases
+  (15.8 CP10k in HRCA snRNA rods) before calling it expression.
+
+**Known issue KI-1 of `visionkb-2026.11.0` (decision D19).** Several small HRCA snRNA amacrine
+subtypes (for example HAC79, HAC82, HAC89, AII*) carry a rod transcript program (KI-1 median
+ratios to the rod level 0.14-0.25 for those four, with PDE6A, SAG, CNGB1 and PDE6G as examples;
+RHO at 11-28 % of the rod level in the run above), most likely rod-amacrine doublets. Their
+`expressed_in` edges to rod genes are real rows of the summaries but probably not expression.
+For photoreceptor genes, and generally any gene that is a strong marker of another major class:
+read the major-class rows first, then treat edges to small subtypes of a different class as
+possible contamination and cite KI-1. No edge is flagged or removed in this release; a
+contamination QC flag is planned for `visionkb-2026.11.1`.
 
 ### 4.3 Which diseases are associated with PRPF31, with PMIDs? (curated claims)
 
 ```python
 print(f"\n# Q3 {Q3_GENE}: disease edges (curated claims) and their evidence")
 g3, _ = resolve(Q3_GENE)
-allrel = get("/relationships", subject=g3, limit=200)
+allrel = get_all("/relationships", subject=g3, limit=200)
 save("q3_all_edges", allrel)
 levels = {}
 for e in allrel["data"]:
@@ -341,16 +406,9 @@ dis = get("/relationships", subject=g3, object_category="biolink:Disease", limit
 save("q3_disease_edges", dis)
 print(f"  edges to diseases: {dis['page']['total']}")
 for e in dis["data"]:
-    print(
-        "   ",
-        e["predicate"],
-        e["object"]["id"],
-        e["object"]["name"],
-        e["knowledge_level"],
-        e["agent_type"],
-        e["primary_knowledge_source"],
-        e["publications"],
-    )
+    o = e["object"]
+    print("   ", e["predicate"], o["id"], o["name"], e["knowledge_level"], e["agent_type"])
+    print("     ", e["primary_knowledge_source"], e["publications"])
 if dis["data"]:
     ev3 = get(f"/evidence/{dis['data'][0]['edge_id']}")
     save("q3_evidence", ev3)
@@ -362,7 +420,22 @@ if dis["data"]:
     show(gs["data"], ["gene_id", "symbol", "score"])
 ```
 
-TBD (pending the run on the real release)
+What the run showed:
+
+- 201 edges from `PRPF31` (`HGNC:15446`): 200 `expressed_in` (observation, `infores:visionkb-heca`)
+  and 1 curated claim.
+- The claim is `biolink:causes` -> `MONDO:0019200` retinitis pigmentosa, `knowledge_assertion`,
+  `manual_validation_of_automated_agent`, `infores:visionkb-retigene`. The edge lists 5 PMIDs (the
+  relationship view is capped at 5); its evidence has 12 StudyResults with 8 distinct PMIDs
+  (`PMID:12714658`, `18450588`, `20232351`, `24419317`, `33576794`, `36672815`, `37809982`,
+  `40674075`), each with the curator `grade`.
+- `/gene-sets` for retinitis pigmentosa returned 3 genes (PRPF31, PRPF4, RP1).
+
+The curated claims come from one source, a haploinsufficiency review: 22 gene-disease or
+gene-phenotype edges in this release (`causes`, `gene_associated_with_condition`,
+`has_phenotype`). **A missing disease edge says nothing about the gene**; say "not in the curated
+source of this release". Use `object_category=biolink:Disease` (or `biolink:PhenotypicFeature`
+for HPO) rather than one predicate, since the curated predicates differ by claim.
 
 ### 4.4 Which atlases can I attach for RPE, or for retina? (datasets, bind records)
 
@@ -371,52 +444,41 @@ print("\n# Q4 datasets with bind records")
 rpe = get("/entities/search", q="retinal pigment epithelial cell", category="biolink:Cell", limit=3)
 save("q4_search_rpe", rpe)
 show(rpe["data"], ["id", "name", "match"])
+rpe_id = next(h["id"] for h in rpe["data"] if h["name"] == "retinal pigment epithelial cell")
 for label, params in (
-    (
-        "rpe_cells",
-        {
-            "entities": next(
-                h["id"] for h in rpe["data"] if h["name"] == "retinal pigment epithelial cell"
-            )
-        },
-    ),
-    ("tissue_retina", {"tissue": "UBERON:0000966"}),
+    ("rpe_cells", {"entities": rpe_id}),
+    ("retina", {"tissue": "UBERON:0000966"}),
 ):
     ds = get("/datasets", limit=20, **params)
     save(f"q4_datasets_{label}", ds)
     print(f"  {label}: {ds['page']['total']} datasets")
     for d in ds["data"]:
-        print(
-            "   ",
-            d["id"],
-            d["version"],
-            d["assay"],
-            d["n_cells"],
-            d["access_level"],
-            d["matched"],
-            d["bind"]["name"],
-        )
+        bind = {k: v for k, v in d["bind"].items() if k != "path"}  # path = HPC-side h5ad path
+        print("   ", d["id"], d["version"], d["assay"], d["n_cells"], d["access_level"], bind)
 
 print("\ndone:", SEQ[0], "responses saved in", OUT)
 ```
 
-TBD (pending the run on the real release)
+What the run showed:
+
+- `retinal pigment epithelial cell` resolved by full text to `CL:0002586` (checked by name).
+- 5 datasets have RPE cells: HRCA scRNA and snRNA, ONONH snRNA, RPE/choroid scRNA and snRNA
+  (`matched` says why; for the last three it also lists the dataset-specific RPE cell states
+  under `via`). All are
+  `heca-2026.05`, `access_level: lab`.
+- `tissue=UBERON:0000966` (retina) returned the two HRCA atlases.
+- Each record carries `bind = {name, path, role: "reference"}`. `path` is the HPC-side `.h5ad`
+  path for an analysis job (AiScientist attaches it); the API never opens it, and the code above
+  leaves it out of the printout. Never publish it.
 
 ## 5. The same with the MCP server
 
 The `visionkb-kg` MCP server (from [aiscientist-mcp](https://github.com/lijinbio/aiscientist-mcp))
-wraps the same endpoints, one tool each; arguments are the query parameters above. The tool
-names below are the server's; this skill's runs used the HTTP API only.
-
-| MCP tool | HTTP endpoint | Use |
-| --- | --- | --- |
-| `get_release` | `GET /v1/release` | release id, atlases, counts, predicates |
-| `search_entities` | `GET /v1/entities/search` | name, symbol, synonym or CURIE to CURIE |
-| `get_relationships` | `GET /v1/relationships` | typed edges from or to an entity |
-| `get_evidence` | `GET /v1/evidence/{edge_id}` | StudyResults and publications of one edge |
-| `get_gene_set` | `GET /v1/gene-sets` | genes expressed in a cell type, or genes of a disease |
-| `query_atlas_expression` | `GET /v1/atlas/expression` | atlas summary rows, no threshold |
-| `find_datasets` | `GET /v1/datasets` | registry records with bind records |
+has one tool per endpoint, with the query parameters as arguments (names as specified for the
+server): `get_release`,
+`search_entities`, `get_relationships`, `get_evidence`, `get_gene_set`, `query_atlas_expression`,
+`find_datasets`. The mapping is in [references/mcp-tools.md](references/mcp-tools.md). This
+skill's runs used the HTTP API only.
 
 ## 6. Validate before answering
 
@@ -429,8 +491,9 @@ names below are the server's; this skill's runs used the HTTP API only.
 4. **Paging.** `page.total` larger than the rows you read means you have not seen everything
    (search returns ranked top-k with `total: null`).
 5. **Donor support.** A high `pct_expressing` with `n_donors_expressing` of 0-1 is weak; say so.
-6. **Ambient RNA and absence.** As in section 3: no edge does not mean no expression; abundant
-   transcripts in snRNA leak into other classes.
+6. **Ambient RNA, doublets and absence.** As in section 3: no edge does not mean no expression;
+   abundant transcripts in snRNA leak into other classes; edges to small subtypes of another
+   class may be doublet programs. Check the release's known issues (KI-1 in `visionkb-2026.11.0`).
 7. **Access level.** HECA datasets are `access_level: lab` until published; do not send their rows
    outside the lab.
 
@@ -441,16 +504,11 @@ names below are the server's; this skill's runs used the HTTP API only.
 - expression (observation) and curated claims (knowledge_assertion) in separate paragraphs, each
   claim with `primary_knowledge_source` and PMIDs;
 - for expression: level, group, `pct_expressing`, `pseudobulk_cp10k`, `n_donors_expressing` /
-  `n_donors`; the ambient-RNA and absence caveats where they apply;
+  `n_donors`; the ambient-RNA, doublet (known issue id) and absence caveats where they apply;
 - for datasets: id, version, assay, cell count, `access_level` and the `bind` record;
 - what was not checked (e.g. other atlases, other levels, pages not read).
 
 ## Troubleshooting
 
-| Symptom | Cause | Fix |
-| --- | --- | --- |
-| HTTP 401 | missing or wrong bearer token | check `VISIONKB_API_TOKEN_FILE` |
-| 400 `missing_anchor` | `/relationships` without `subject` or `object` | anchor on a CURIE |
-| 400 `predicate_not_in_release` | predicate not used in this release | read `predicates_in_graph` from `/release` |
-| `httpx.InvalidURL: Invalid port: ':1]'` | a `[::1]` entry in `NO_PROXY` (httpx 0.28.1) | remove that entry for the client process |
-| 503 on `/v1/ready` | Neo4j, summaries or PostgreSQL down | `bin/visionkb health` on the server |
+HTTP 401, `missing_anchor`, truncated lists, a proxy setting that breaks httpx, and a Neo4j store
+that loads fewer nodes than the manifest: see [references/troubleshooting.md](references/troubleshooting.md).

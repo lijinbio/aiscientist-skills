@@ -8,6 +8,14 @@ All notable changes to this repository are documented here. The format follows
 
 ### Added
 
+- `knowledge-graph/answer-eye-questions-with-visionkb-kg` 0.0.1, instruction only, and the
+  `knowledge-graph` category (plugin entry and CODEOWNERS line): answers knowledge questions about
+  eye genes, cell types, diseases and datasets with the read-only VisionKB API (entities, atlas
+  summaries, typed Biolink relationships with `knowledge_level`, evidence, datasets with bind
+  records), and names the equivalent `visionkb-kg` MCP tools. It states the expression-edge rule,
+  the ambient-RNA and doublet caveats (known issue KI-1) and that a missing edge is not evidence of
+  non-expression. Tested on the KG release `visionkb-2026.11.0` served by visionkb-api 0.1.1. It
+  comes with the trigger eval `ask-eye-knowledge-graph-expression-and-disease`.
 - `literature/read-whole-corpus-with-claude` 0.0.1: answers a question from a chunked full-text
   corpus by having Claude Haiku read every passage, ten per call, as numbered sentences, and keep
   the sentences that bear on it (verbatim, with PMID and page). `scripts/read_corpus.py` estimates

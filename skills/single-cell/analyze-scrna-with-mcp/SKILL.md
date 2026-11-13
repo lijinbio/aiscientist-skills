@@ -4,7 +4,7 @@ description: Run QC, clustering, differential expression, enrichment and marker 
 license: MIT
 metadata:
   category: single-cell
-  version: 0.1.2
+  version: 0.1.3
   status: community
   tags: mcp, scrna-analysis
   tested-with: aiscientist-mcp-scrna-analysis 0.0.5, common 0.0.4; frozen scientific Python 3.11.15 and Scanpy 1.11.5; released SIF CLI/schema/file verification and full native HPC regression passed; website acceptance is separate
@@ -15,7 +15,7 @@ metadata:
   requires-secrets: none
   mcp-server: scrna-analysis
   mcp-package-version: 0.0.5
-  image: "docker://ghcr.io/liujs123456/mcp-scrna-analysis@sha256:6bf03b30e2c9a3af6043eef1751518494ae59b728cb175faf003ecab697b7afa"
+  image: "docker://ghcr.io/lijinbio/mcp-scrna-analysis@sha256:1c978c1540712219862c211ddf7d1410608f9461d35fa93dadf3b4ad475c9966"
   cpus: "4"
   mem_gb: "48"
   time_limit: "01:00:00"
@@ -32,7 +32,7 @@ Read the client's actual tool inventory and advertised schemas. Tool names below
 server's native names; a host may qualify them. Do not invent a `mcp_` prefix or call an
 unregistered name. If this service is absent, keep the currently available AiScientist tools
 or the installed standalone analysis skill. This migration skill does not change their image,
-install an unpublished release, or retire the legacy path. Its image pin names the published fork validation release.
+install an unpublished release, or retire the legacy path. Its image pin names the upstream `scrna-analysis-v0.0.5` release.
 
 The service operator binds `SCRNA_DATASET`, `SCRNA_READ_ROOTS`, and writable `AISCI_DATA_DIR`.
 An explicit `dataset` must be admitted on the server host. Tool `input` selects a checkpoint

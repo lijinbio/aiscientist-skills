@@ -4,7 +4,7 @@ description: Inspect an admitted data file and render a conceptual Graphviz sche
 license: MIT
 metadata:
   category: utilities
-  version: 0.1.0
+  version: 0.1.1
   status: community
   tags: mcp, data-utilities
   tested-with: aiscientist-mcp-data-utilities 0.0.2, common 0.0.4, MCP 2.3.0, Python 3.14.3, Graphviz 2.44.0; real 1.35 GB HECA file and original PNG parity
@@ -15,7 +15,7 @@ metadata:
   requires-secrets: none
   mcp-server: data-utilities
   mcp-package-version: 0.0.2
-  image: "docker://ghcr.io/liujs123456/mcp-data-utilities@sha256:dd89779ffa9d42597d7dc3d856a2cf71fb8d0552e1e778713092ffdc09aa951c"
+  image: "docker://ghcr.io/lijinbio/mcp-data-utilities@sha256:e3afbd62473f9eba7ac4665964c4312a1272f684b1cd8b17a0a0d5a63add0396"
   cpus: "2"
   mem_gb: "8"
   time_limit: "00:30:00"
@@ -25,7 +25,7 @@ metadata:
 
 Use the client's registered `data-utilities` service and actual advertised tool names. If it
 is absent, keep existing `inspect_dataset`/`make_schematic` or the established standalone
-workflow. Do not invent an MCP prefix or substitute an unpublished image. The pinned image is a fork validation release. The operator must register its matching
+workflow. Do not invent an MCP prefix or substitute an unpublished image. The pinned image is the upstream `data-utilities-v0.0.2` release. The operator must register its matching
 service and tool catalog before use.
 
 ## Inspect before assuming the format

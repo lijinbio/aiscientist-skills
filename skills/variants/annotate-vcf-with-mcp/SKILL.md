@@ -4,7 +4,7 @@ description: Annotate an admitted VCF through an already configured variant-anno
 license: MIT
 metadata:
   category: variants
-  version: 0.1.0
+  version: 0.1.1
   status: community
   tags: mcp, variant-annotation
   tested-with: aiscientist-mcp-variant-annotation 0.0.2, common 0.0.4; native MCP and deterministic VEP/bcftools regression fixtures; release-112.0 VEP image build
@@ -15,7 +15,7 @@ metadata:
   requires-secrets: none
   mcp-server: variant-annotation
   mcp-package-version: 0.0.2
-  image: "docker://ghcr.io/liujs123456/mcp-variant-annotation@sha256:92c875d268b8f89054860cedd13dcbd5b53498e9321868180e9e56a2b56eb388"
+  image: "docker://ghcr.io/lijinbio/mcp-variant-annotation@sha256:a1861a81a36d154021ce5a283f11fa557e4756ac750cfce90dc57827a49bd2b6"
   cpus: "4"
   mem_gb: "16"
   time_limit: "01:00:00"

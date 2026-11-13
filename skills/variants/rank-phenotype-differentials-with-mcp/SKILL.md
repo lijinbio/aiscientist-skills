@@ -4,7 +4,7 @@ description: Map clinical phenotype text to grounded HPO terms and rank a resear
 license: MIT
 metadata:
   category: variants
-  version: 0.1.1
+  version: 0.1.2
   status: community
   tags: mcp, phenotype-diagnosis
   tested-with: aiscientist-mcp-phenotype-diagnosis 0.0.4, common 0.0.4; complete literature evidence verified by local real MCP protocol tests; final image and website acceptance pending; predecessor has synthetic HPO/LIRICAL evidence
@@ -15,7 +15,7 @@ metadata:
   requires-secrets: none
   mcp-server: phenotype-diagnosis
   mcp-package-version: 0.0.4
-  image: "docker://ghcr.io/liujs123456/mcp-phenotype-diagnosis@sha256:10af1539b9d86ebe6e33fa39506b9c58630c5c8bbec5eacaaab16894b656803b"
+  image: "docker://ghcr.io/lijinbio/mcp-phenotype-diagnosis@sha256:d20ed2dc2e576b8a524946d13816757ecb0a7b72da0299b7f022e4f89f351f21"
   cpus: "4"
   mem_gb: "24"
   time_limit: "01:00:00"

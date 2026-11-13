@@ -6,6 +6,24 @@ All notable changes to this repository are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.6] - 2026-11-13
+
+### Changed
+
+- The seven native MCP skills pin the upstream `ghcr.io/lijinbio/mcp-*` release images
+  instead of the contributor's fork validation images, each with a patch version bump:
+  `literature/read-evidence-with-mcp` 0.1.2 (`mcp-literature@sha256:05ab531fb89a…`);
+  `single-cell/analyze-scrna-with-mcp` 0.1.3 (`mcp-scrna-analysis@sha256:1c978c154071…`);
+  `single-cell/annotate-cells-with-scgpt-mcp` 0.1.1 (`mcp-scgpt-annotation@sha256:7ee18dc0df9f…`);
+  `single-cell/qc-cellranger-with-mcp` 0.1.2 (`mcp-cellqc@sha256:d0f456eb4c76…`);
+  `utilities/inspect-data-and-draw-schematics-with-mcp` 0.1.1 (`mcp-data-utilities@sha256:e3afbd62473f…`);
+  `variants/annotate-vcf-with-mcp` 0.1.1 (`mcp-variant-annotation@sha256:a1861a81a36d…`);
+  `variants/rank-phenotype-differentials-with-mcp` 0.1.2 (`mcp-phenotype-diagnosis@sha256:d20ed2dc2e57…`).
+  The upstream images are built by the release workflow from the same source tree as the
+  validated fork builds (`5981cc7`); recorded acceptance evidence refers to the fork builds.
+- First upstream release of the 0.2.2–0.2.5 changes, which were published only as fork
+  validation prereleases.
+
 ## [0.2.5] - 2026-11-13
 
 ### Fixed

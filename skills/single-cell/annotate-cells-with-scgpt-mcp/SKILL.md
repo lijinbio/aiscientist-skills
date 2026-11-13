@@ -4,7 +4,7 @@ description: Transfer cell labels from an approved reference model through an al
 license: MIT
 metadata:
   category: single-cell
-  version: 0.1.0
+  version: 0.1.1
   status: community
   tags: mcp, scgpt-annotation
   tested-with: aiscientist-mcp-scgpt-annotation 0.0.3, common 0.0.4, torch 2.3.0, scGPT 0.2.4, scanpy 1.11.5, anndata 0.11.4; real GPU old/new parity on 480 HECA cells
@@ -15,7 +15,7 @@ metadata:
   requires-secrets: none
   mcp-server: scgpt-annotation
   mcp-package-version: 0.0.3
-  image: "docker://ghcr.io/liujs123456/mcp-scgpt-annotation@sha256:1133d106342831e9d6cd7fc5961e38eb2043142852219105bac269065213b2d5"
+  image: "docker://ghcr.io/lijinbio/mcp-scgpt-annotation@sha256:7ee18dc0df9f11ebc4cb9cc9ec417d99c2a94b1f664fe3561f78e88b0a954df9"
   cpus: "4"
   mem_gb: "48"
   time_limit: "01:00:00"
@@ -26,7 +26,7 @@ metadata:
 This is reference-model inference with the validated scGPT harness. It does not ask a language
 model to name cells. Use the client's registered `scgpt-annotation` tools and advertised names;
 if unavailable, retain the existing approved scGPT deployment. Do not invent an MCP prefix,
-download unapproved weights, or change the released standalone workflow's environment. The pinned image is a fork validation release; external assets remain operator supplied.
+download unapproved weights, or change the released standalone workflow's environment. The pinned image is the upstream `scgpt-annotation-v0.0.3` release; external assets remain operator supplied.
 
 ## Verify external assets and GPU
 

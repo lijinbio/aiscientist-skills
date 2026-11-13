@@ -4,18 +4,18 @@ description: Map clinical phenotype text to grounded HPO terms and rank a resear
 license: MIT
 metadata:
   category: variants
-  version: 0.1.0
+  version: 0.1.1
   status: community
   tags: mcp, phenotype-diagnosis
-  tested-with: aiscientist-mcp-phenotype-diagnosis 0.0.3, common 0.0.4; real staged LIRICAL on synthetic HPO input; native predecessor also exercised model extraction and literature adjudication
+  tested-with: aiscientist-mcp-phenotype-diagnosis 0.0.4, common 0.0.4; complete literature evidence verified by local real MCP protocol tests; final image and website acceptance pending; predecessor has synthetic HPO/LIRICAL evidence
   compute: 'Real staged LIRICAL phenotype-only check: 8621 candidates; input was synthetic, not patient data'
   requires-gpu: 'false'
   scheduler: optional
   requires-network: runtime
   requires-secrets: none
   mcp-server: phenotype-diagnosis
-  mcp-package-version: 0.0.3
-  image: "docker://ghcr.io/liujs123456/mcp-phenotype-diagnosis@sha256:bbd67d80aa82861b0c095643e162c2449218b4bbba9e09ce8ffbd958b72eb8d3"
+  mcp-package-version: 0.0.4
+  image: "docker://ghcr.io/liujs123456/mcp-phenotype-diagnosis@sha256:10af1539b9d86ebe6e33fa39506b9c58630c5c8bbec5eacaaab16894b656803b"
   cpus: "4"
   mem_gb: "24"
   time_limit: "01:00:00"
@@ -67,8 +67,10 @@ waits in the existing allocation.
 Read the original LIRICAL probabilities and scoring mode, complete TSV/full result, mapped and
 excluded HPO terms, evidence grades, citations and flags. Literature adjudication must not
 replace the original LIRICAL probability with a model's confidence. No retrieved evidence is
-not the same as refutation. If the literature service returns `response_omitted=true`, this
-service refuses to score truncated contexts as complete evidence; resolve that retrieval first.
+not the same as refutation. If the literature service returns `response_omitted=true`, version
+0.0.4 reads its bounded MCP result-resource pages and verifies task identity, size, contiguous
+offsets and SHA-256 before scoring the complete evidence. Missing, oversized or inconsistent
+pages remain an explicit ungraded failure; a preview alone is never complete evidence.
 Bounded previews retain total counts; consult `full_result` before
 claiming to have reviewed every candidate. Present a research differential and uncertainties,
 not an established diagnosis.
@@ -77,3 +79,9 @@ Real staged LIRICAL was exercised with synthetic clinical input and returned 8,6
 rows; complete results, bounded MCP previews and status calls were checked. This is not a
 patient validation or validation of the generative extraction/literature path. Track those
 separate deployment gates before removing the current application workflow.
+
+The predecessor's selected-session website test completed HPO mapping and LIRICAL, but its
+truncated literature reply could not be graded. Version 0.0.4 repairs that protocol gap and has
+real stdio tests using large synthetic evidence. Final released-image and website model
+acceptance remain pending; do not describe that earlier LIRICAL-only result as completed
+literature adjudication.

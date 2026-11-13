@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "registry": "aiscientist-skills",
-  "registry_version": "0.2.4",
-  "generator": "aiscientist-skills 0.2.4",
+  "registry_version": "0.2.5",
+  "generator": "aiscientist-skills 0.2.5",
   "categories": [
     {
       "name": "crispr-screens",
@@ -160,7 +160,7 @@
       "name": "read-evidence-with-mcp",
       "category": "literature",
       "path": "skills/literature/read-evidence-with-mcp",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "status": "community",
       "description": "Search citations, retrieve local corpus passages, answer with PaperQA or curate grounded gene evidence through an already configured literature MCP service. Use when that service and the required corpus/model are available and task coverage, citations and partial results must be tracked; retain current retrieval tools when the MCP service is absent.",
       "tags": [
@@ -168,7 +168,7 @@
         "literature"
       ],
       "license": "MIT",
-      "tested_with": "aiscientist-mcp-literature 0.0.3, common 0.0.4; real Europe PMC and staged RetiGene/PubMedBERT retrieval; native predecessor has cited-answer and partial-curation evidence",
+      "tested_with": "aiscientist-mcp-literature 0.0.4, common 0.0.4; bounded complete-result resources verified by local real MCP protocol tests; final image and website acceptance pending; predecessor has public search, retrieval and cited-answer evidence",
       "author": "",
       "requirements": {
         "compute": "Public search and local retrieval tested; model answer/curation resources depend on the configured deployment",
@@ -248,7 +248,7 @@
       "name": "analyze-scrna-with-mcp",
       "category": "single-cell",
       "path": "skills/single-cell/analyze-scrna-with-mcp",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "status": "community",
       "description": "Run QC, clustering, differential expression, enrichment and marker annotation through an already configured scrna-analysis MCP service. Use for an AnnData workflow when this service is available and its checkpoints and asynchronous task results must be carried between steps; retain the existing standalone workflow when it is not registered.",
       "tags": [
@@ -256,7 +256,7 @@
         "scrna-analysis"
       ],
       "license": "MIT",
-      "tested_with": "aiscientist-mcp-scrna-analysis 0.0.5, common 0.0.4; frozen scientific Python 3.11.15 and Scanpy 1.11.5; released SIF CLI/schema/file verification passed; full native acceptance pending",
+      "tested_with": "aiscientist-mcp-scrna-analysis 0.0.5, common 0.0.4; frozen scientific Python 3.11.15 and Scanpy 1.11.5; released SIF CLI/schema/file verification and full native HPC regression passed; website acceptance is separate",
       "author": "",
       "requirements": {
         "compute": "4 CPUs, 48 GB requested; 480 real cells x 1550 genes, 6 samples, 2 tissue regions; this is a regression subset, not full-atlas sizing",
@@ -731,7 +731,7 @@
       "name": "rank-phenotype-differentials-with-mcp",
       "category": "variants",
       "path": "skills/variants/rank-phenotype-differentials-with-mcp",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "status": "community",
       "description": "Map clinical phenotype text to grounded HPO terms and rank a research differential through an already configured phenotype-diagnosis MCP service with LIRICAL and optional literature adjudication. Use for explicit service-based analysis while preserving negation, uncertainty and original probabilities; retain the established workflow when the service is unavailable.",
       "tags": [
@@ -739,7 +739,7 @@
         "phenotype-diagnosis"
       ],
       "license": "MIT",
-      "tested_with": "aiscientist-mcp-phenotype-diagnosis 0.0.3, common 0.0.4; real staged LIRICAL on synthetic HPO input; native predecessor also exercised model extraction and literature adjudication",
+      "tested_with": "aiscientist-mcp-phenotype-diagnosis 0.0.4, common 0.0.4; complete literature evidence verified by local real MCP protocol tests; final image and website acceptance pending; predecessor has synthetic HPO/LIRICAL evidence",
       "author": "",
       "requirements": {
         "compute": "Real staged LIRICAL phenotype-only check: 8621 candidates; input was synthetic, not patient data",

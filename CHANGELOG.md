@@ -6,6 +6,19 @@ All notable changes to this repository are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.5] - 2026-11-13
+
+### Fixed
+
+- Literature and phenotype MCP skills 0.1.1 pin the published 0.0.4 images.
+  Complete literature evidence is transferred through bounded MCP resources with
+  identity, size, offset and SHA-256 checks. Local real-protocol tests passed;
+  released-image and selected-session website gates remain pending. The earlier
+  website LIRICAL-only result is retained as failed literature-adjudication evidence.
+- `single-cell/analyze-scrna-with-mcp` 0.1.2 records the now-passing final 0.0.5
+  native HPC regression. Its image pin is unchanged; website acceptance remains
+  separate. Historical 0.2.4 pending-test provenance is preserved.
+
 ## [0.2.4] - 2026-11-13
 
 ### Fixed

@@ -4,18 +4,18 @@ description: Search citations, retrieve local corpus passages, answer with Paper
 license: MIT
 metadata:
   category: literature
-  version: 0.1.0
+  version: 0.1.1
   status: community
   tags: mcp, literature
-  tested-with: aiscientist-mcp-literature 0.0.3, common 0.0.4; real Europe PMC and staged RetiGene/PubMedBERT retrieval; native predecessor has cited-answer and partial-curation evidence
+  tested-with: aiscientist-mcp-literature 0.0.4, common 0.0.4; bounded complete-result resources verified by local real MCP protocol tests; final image and website acceptance pending; predecessor has public search, retrieval and cited-answer evidence
   compute: Public search and local retrieval tested; model answer/curation resources depend on the configured deployment
   requires-gpu: 'false'
   scheduler: optional
   requires-network: runtime
   requires-secrets: none
   mcp-server: literature
-  mcp-package-version: 0.0.3
-  image: "docker://ghcr.io/liujs123456/mcp-literature@sha256:655ad065365672a67b8b6e8ba3f1cc71a7afde141e28ed47b73f17f9eb1c148b"
+  mcp-package-version: 0.0.4
+  image: "docker://ghcr.io/liujs123456/mcp-literature@sha256:ea3d66b0b7bc6f217da5dd78e1fd16ae018cea780e45728a097fbaa306fd12e7"
   cpus: "4"
   mem_gb: "24"
   time_limit: "01:00:00"
@@ -79,7 +79,13 @@ artifact tables contain the complete data; total counts are not the preview leng
 no retrieved evidence from evidence that contradicts a claim. Report corpus/model versions,
 method, limits, task IDs and only citations that support the associated statement.
 
-Native-image acceptance includes Europe PMC, RetiGene/PubMedBERT retrieval and a cited answer
+For a completed large result, `full_result_uri` identifies bounded MCP `resources/read`
+pages. Read every page and verify the task identity, contiguous offsets, stable total size and
+SHA-256 before treating the JSON as complete evidence. The service refuses results over 32 MiB.
+The 0.0.4 resource repair has local real-protocol tests for large synthetic evidence and missing
+or corrupt pages; its final released-image and selected-session website gates remain pending.
+
+Predecessor native-image acceptance includes Europe PMC, RetiGene/PubMedBERT retrieval and a cited answer
 to a public PRPF31 deletion/segregation question. A broader mechanism question abstained despite
 retrieved contexts. The four-passage extraction smoke produced a flagged gene candidate, not a
 validated gene list or whole-corpus curation. Verify the actual answer and review flags for

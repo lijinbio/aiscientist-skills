@@ -4,10 +4,10 @@ description: Run QC, clustering, differential expression, enrichment and marker 
 license: MIT
 metadata:
   category: single-cell
-  version: 0.1.1
+  version: 0.1.2
   status: community
   tags: mcp, scrna-analysis
-  tested-with: aiscientist-mcp-scrna-analysis 0.0.5, common 0.0.4; frozen scientific Python 3.11.15 and Scanpy 1.11.5; released SIF CLI/schema/file verification passed; full native acceptance pending
+  tested-with: aiscientist-mcp-scrna-analysis 0.0.5, common 0.0.4; frozen scientific Python 3.11.15 and Scanpy 1.11.5; released SIF CLI/schema/file verification and full native HPC regression passed; website acceptance is separate
   compute: 4 CPUs, 48 GB requested; 480 real cells x 1550 genes, 6 samples, 2 tissue regions; this is a regression subset, not full-atlas sizing
   requires-gpu: 'false'
   scheduler: optional
@@ -89,7 +89,8 @@ stack. The original 63 scientific packages retain their archive and installed-fi
 12 additional packages are declared separately. The released SIF passed default CLI, complete
 schema and 75-package / 13,117-file verification. Local image comparisons restored marker
 parity (0.0.4) and default-auto ComBat parity (0.0.5) at the original tolerances. Final released
-0.0.5 native HPC acceptance is still pending, and website acceptance is a separate cutover gate.
+0.0.5 native HPC acceptance also passed on this regression subset. Website acceptance remains
+a separate cutover gate; the earlier 0.2.4 registry recorded the then-pending native test.
 
 For integration, retain the unchanged requested arguments and the returned `integration_policy`
 record. Its `deployed-auto-combat-v1` policy makes omitted/`auto` select ComBat independently of

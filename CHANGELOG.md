@@ -6,6 +6,21 @@ All notable changes to this repository are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Seven community, instruction-only MCP migration skills for scRNA analysis, CellQC, scGPT,
+  literature, variant annotation, phenotype ranking and data utilities, with trigger evals.
+  They require an actually registered service, preserve existing standalone/legacy workflows,
+  distinguish real and synthetic acceptance evidence, and leave image pins unset until release.
+- The `utilities` category for bounded dataset inspection and deterministic schematic rendering.
+
+### Fixed
+
+- `single-cell/explore-atlas-expression-with-aiscientist-mcp`: use AiScientist's typed MCP
+  tools and `atlas_write_report` for the query report. Standalone MCP and CLI clients retain
+  the server's `write_report` name; dataset binding, execution settings and artifact collection
+  are supplied by the AiScientist bridge.
+
 ## [0.2.1] - 2026-11-10
 
 ### Added

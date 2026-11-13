@@ -57,6 +57,7 @@ Scientific literature: recovering, verifying and assembling full-text paper corp
 
 | Skill | Status | Version | What it does |
 | --- | --- | --- | --- |
+| [`read-evidence-with-mcp`](skills/literature/read-evidence-with-mcp/) | ⚪ community | 0.1.0 | Search citations, retrieve local corpus passages, answer with PaperQA or curate grounded gene evidence through an already configured literature MCP service. |
 | [`read-whole-corpus-with-claude`](skills/literature/read-whole-corpus-with-claude/) | ⚪ community | 0.0.1 | Answer a question from a chunked full-text literature corpus completely, by having Claude Haiku read every passage (not the top-k of a search) and return the numbers of the sentences that bear on it, so every quote is verbatim. |
 | [`recover-paper-pdfs`](skills/literature/recover-paper-pdfs/) | ⚪ community | 1.0.0 | Recover and assemble a corpus of scientific paper PDFs from a list of PMIDs or DOIs through a ladder of legal sources (open-access APIs, PMC and Europe PMC, publisher open access, then the user's institutional access through the campus network, VPN or library discovery search), verifying every PDF and tracking each paper in a manifest. |
 
@@ -66,14 +67,25 @@ Single-cell and single-nucleus RNA-seq: QC, integration, annotation and downstre
 
 | Skill | Status | Version | What it does |
 | --- | --- | --- | --- |
+| [`analyze-scrna-with-mcp`](skills/single-cell/analyze-scrna-with-mcp/) | ⚪ community | 0.1.0 | Run QC, clustering, differential expression, enrichment and marker annotation through an already configured scrna-analysis MCP service. |
+| [`annotate-cells-with-scgpt-mcp`](skills/single-cell/annotate-cells-with-scgpt-mcp/) | ⚪ community | 0.1.0 | Transfer cell labels from an approved reference model through an already configured scgpt-annotation MCP service. |
 | [`annotate-clusters-by-markers`](skills/single-cell/annotate-clusters-by-markers/) | ⚪ community | 1.0.0 | Reference-free cell-type annotation of clusters from a curated marker panel with scanpy. |
 | [`compare-conditions-by-celltype`](skills/single-cell/compare-conditions-by-celltype/) | ⚪ community | 1.0.0 | Condition-vs-control differential expression within each cell type (for example KO vs WT, or disease vs control, per cell type) with scanpy rank_genes_groups (Wilcoxon, explicit reference group). |
 | [`compare-two-groups-with-scanpy`](skills/single-cell/compare-two-groups-with-scanpy/) | ⚪ community | 1.0.0 | Differential expression between two named groups of cells (for example disease vs control, or cluster 3 vs cluster 5) with scanpy rank_genes_groups (Wilcoxon) and an explicit reference group, from an AnnData file to a ranked CSV table and a JSON summary. |
 | [`crossvalidate-scgpt-vs-leiden`](skills/single-cell/crossvalidate-scgpt-vs-leiden/) | ⚪ community | 1.0.0 | Cross-validate scGPT per-cell cell-type predictions against the data's own structure. |
 | [`explore-atlas-expression-with-aiscientist-mcp`](skills/single-cell/explore-atlas-expression-with-aiscientist-mcp/) | ⚪ community | 0.0.1 | Answer a gene expression query such as "show LRAT across retinal cell types" on a large single-cell or single-nucleus atlas .h5ad with raw counts, by calling the atlas-expression-exploration MCP server from the aiscientist-mcp repository. |
 | [`prioritize-disease-genes-with-atlas`](skills/single-cell/prioritize-disease-genes-with-atlas/) | ⚪ community | 1.0.0 | Prioritize disease-associated genes by combining an existing condition-vs-control differential expression result (per cell type) with a precalculated cell-type atlas, offline. |
+| [`qc-cellranger-with-mcp`](skills/single-cell/qc-cellranger-with-mcp/) | ⚪ community | 0.1.0 | Run ambient correction, filtering and doublet removal through an already configured CellQC MCP service for raw and filtered Cell Ranger deliveries. |
 | [`qc-snrna-with-cellqc-standalone`](skills/single-cell/qc-snrna-with-cellqc-standalone/) | 🟢 core | 1.2.0 | Run the CellQC pipeline (ambient correction, count/feature/mitochondrial filtering, doublet calling, nuclear fraction) over a cohort of 10x Cell Ranger libraries by hand, with bash plus conda or a container, from installing cellqc to validating result/metrics.csv. |
 | [`score-gene-signatures-with-scanpy`](skills/single-cell/score-gene-signatures-with-scanpy/) | ⚪ community | 1.0.0 | Score every cell for one or more gene signatures with scanpy score_genes (the signature's mean expression minus that of a matched random control gene set) and summarise each score per group, for example cell type by condition, as n, mean, median and IQR, with per-cell scores, box plots and a JSON coverage report. |
+
+### utilities
+
+Scientific data triage and deterministic conceptual figures through configured analysis services.
+
+| Skill | Status | Version | What it does |
+| --- | --- | --- | --- |
+| [`inspect-data-and-draw-schematics-with-mcp`](skills/utilities/inspect-data-and-draw-schematics-with-mcp/) | ⚪ community | 0.1.0 | Inspect an admitted data file and render a conceptual Graphviz schematic through an already configured data-utilities MCP service. |
 
 ### variants
 
@@ -81,10 +93,12 @@ DNA variant analysis from VCF files: normalization, callset QC, result tables, r
 
 | Skill | Status | Version | What it does |
 | --- | --- | --- | --- |
+| [`annotate-vcf-with-mcp`](skills/variants/annotate-vcf-with-mcp/) | ⚪ community | 0.1.0 | Annotate an admitted VCF through an already configured variant-annotation MCP service using matching offline VEP references, then inspect complete consequence, frequency and ClinVar tables. |
 | [`build-variant-db-with-tiledbvcf`](skills/variants/build-variant-db-with-tiledbvcf/) | ⚪ community | 1.0.0 | Build and query a TileDB-VCF variant database for a cohort with tiledbvcf-py - ingest many indexed single-sample VCFs into one compressed sparse-array dataset (a re-run adds only new samples, with no re-merging), query genomic regions across all or selected samples, and export the matching records (sample, contig, position, alleles, genotype) to a TSV with per-sample counts. |
 | [`normalize-vcf-with-bcftools`](skills/variants/normalize-vcf-with-bcftools/) | ⚪ community | 1.0.0 | Normalize a VCF with bcftools norm before annotation or ClinVar/gnomAD matching - split multiallelic sites into biallelic records, atomize MNPs into SNPs, then left-align and trim indels against the reference FASTA of the same build - writing an indexed normalized.vcf.gz and a JSON of record counts before and after. |
 | [`prioritize-clinical-variants`](skills/variants/prioritize-clinical-variants/) | ⚪ community | 1.0.0 | Rank annotated variants into research-triage tiers (ClinVar pathogenic, likely pathogenic, VUS favouring pathogenic, VUS, likely benign, benign) from ClinVar significance used verbatim, gnomAD allele frequency against a dominant or recessive disease-model cutoff and the ACMG BA1 5 percent rule, and in-silico predictors (SIFT, PolyPhen, REVEL, CADD, AlphaMissense) as supporting evidence only. |
 | [`qc-vcf-callset`](skills/variants/qc-vcf-callset/) | ⚪ community | 1.0.0 | Judge whether a germline VCF callset is trustworthy before interpreting any variant - Ti/Tv, Het/Hom, SNP, indel and multiallelic counts, sample count and genotype call rate from bcftools stats (falling back to cyvcf2, then to a plain-Python Ti/Tv scan) - and flag values outside the expected human WGS or WES ranges. |
+| [`rank-phenotype-differentials-with-mcp`](skills/variants/rank-phenotype-differentials-with-mcp/) | ⚪ community | 0.1.0 | Map clinical phenotype text to grounded HPO terms and rank a research differential through an already configured phenotype-diagnosis MCP service with LIRICAL and optional literature adjudication. |
 | [`write-variant-tables`](skills/variants/write-variant-tables/) | ⚪ community | 1.0.0 | Write the five standard variant-annotation result tables - consequence, impact and ClinVar-significance distributions, a ClinVar pathogenic and likely-pathogenic list, and a shortlist of rare, damaging variants not in ClinVar - plus a JSON summary, from an annotated per-variant TSV (VEP consequence and impact, SIFT, PolyPhen, max population AF, rsID, ClinVar significance), in pure Python without re-parsing the VCF or re-running VEP. |
 
 <!-- END SKILLS -->

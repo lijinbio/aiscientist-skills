@@ -6,6 +6,18 @@ All notable changes to this repository are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.4] - 2026-11-13
+
+### Fixed
+
+- `single-cell/analyze-scrna-with-mcp` 0.1.1 pins the published scRNA MCP 0.0.5 image.
+  Its provenance records the frozen Scanpy 1.11.5 scientific stack, explicit
+  `deployed-auto-combat-v1` default policy, optional explicit Harmony, and private
+  nullable-metadata normalization. Released SIF CLI/schema/file verification passed;
+  full native and website acceptance remain separate pending gates. Earlier
+  same-environment algorithm parity is not presented as old-environment equivalence.
+  No other skill image changes in this registry release.
+
 ## [0.2.3] - 2026-11-13
 
 ### Fixed

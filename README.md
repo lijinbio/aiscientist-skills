@@ -67,7 +67,7 @@ Single-cell and single-nucleus RNA-seq: QC, integration, annotation and downstre
 
 | Skill | Status | Version | What it does |
 | --- | --- | --- | --- |
-| [`analyze-scrna-with-mcp`](skills/single-cell/analyze-scrna-with-mcp/) | ⚪ community | 0.1.0 | Run QC, clustering, differential expression, enrichment and marker annotation through an already configured scrna-analysis MCP service. |
+| [`analyze-scrna-with-mcp`](skills/single-cell/analyze-scrna-with-mcp/) | ⚪ community | 0.1.1 | Run QC, clustering, differential expression, enrichment and marker annotation through an already configured scrna-analysis MCP service. |
 | [`annotate-cells-with-scgpt-mcp`](skills/single-cell/annotate-cells-with-scgpt-mcp/) | ⚪ community | 0.1.0 | Transfer cell labels from an approved reference model through an already configured scgpt-annotation MCP service. |
 | [`annotate-clusters-by-markers`](skills/single-cell/annotate-clusters-by-markers/) | ⚪ community | 1.0.0 | Reference-free cell-type annotation of clusters from a curated marker panel with scanpy. |
 | [`compare-conditions-by-celltype`](skills/single-cell/compare-conditions-by-celltype/) | ⚪ community | 1.0.0 | Condition-vs-control differential expression within each cell type (for example KO vs WT, or disease vs control, per cell type) with scanpy rank_genes_groups (Wilcoxon, explicit reference group). |

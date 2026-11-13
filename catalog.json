@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "registry": "aiscientist-skills",
-  "registry_version": "0.2.2",
-  "generator": "aiscientist-skills 0.2.2",
+  "registry_version": "0.2.3",
+  "generator": "aiscientist-skills 0.2.3",
   "categories": [
     {
       "name": "crispr-screens",
@@ -475,7 +475,7 @@
       "name": "qc-cellranger-with-mcp",
       "category": "single-cell",
       "path": "skills/single-cell/qc-cellranger-with-mcp",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "status": "community",
       "description": "Run ambient correction, filtering and doublet removal through an already configured CellQC MCP service for raw and filtered Cell Ranger deliveries. Use when this service is present and QC checkpoints must feed another analysis service; keep the standalone CellQC method for deployments without the MCP service.",
       "tags": [
@@ -483,7 +483,7 @@
         "cellqc"
       ],
       "license": "MIT",
-      "tested_with": "aiscientist-mcp-cellqc 0.0.4, common 0.0.4; native MCP and original calculation regression tests; CellQC 0.3.6 image build",
+      "tested_with": "aiscientist-mcp-cellqc 0.0.5, common 0.0.4; image and default Docker CLI smoke; frozen CellQC 0.3.6 environment; strict cohort parity and website acceptance pending",
       "author": "",
       "requirements": {
         "compute": "Service default: 16 CPUs, 80 GB, 8 hours; size the real cohort separately",

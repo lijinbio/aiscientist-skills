@@ -6,6 +6,16 @@ All notable changes to this repository are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-11-13
+
+### Fixed
+
+- `single-cell/qc-cellranger-with-mcp` 0.1.1 pins the published CellQC MCP 0.0.5 image
+  by its release digest. It retains the frozen scientific environment from 0.0.4 and
+  fixes default Docker entry-point activation. The skill distinguishes the passing
+  image/CLI smoke from still-pending strict full-cohort parity and website acceptance.
+  No other skill image changes in this registry release.
+
 ## [0.2.2] - 2026-11-12
 
 ### Added

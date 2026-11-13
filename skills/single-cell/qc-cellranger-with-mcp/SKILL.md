@@ -4,18 +4,18 @@ description: Run ambient correction, filtering and doublet removal through an al
 license: MIT
 metadata:
   category: single-cell
-  version: 0.1.0
+  version: 0.1.1
   status: community
   tags: mcp, cellqc
-  tested-with: aiscientist-mcp-cellqc 0.0.4, common 0.0.4; native MCP and original calculation regression tests; CellQC 0.3.6 image build
+  tested-with: aiscientist-mcp-cellqc 0.0.5, common 0.0.4; image and default Docker CLI smoke; frozen CellQC 0.3.6 environment; strict cohort parity and website acceptance pending
   compute: 'Service default: 16 CPUs, 80 GB, 8 hours; size the real cohort separately'
   requires-gpu: 'false'
   scheduler: optional
   requires-network: install
   requires-secrets: none
   mcp-server: cellqc
-  mcp-package-version: 0.0.4
-  image: "docker://ghcr.io/liujs123456/mcp-cellqc@sha256:0c0eb0e7595328742619289fab68a14706ba7154c50736818f81574909a5ebe4"
+  mcp-package-version: 0.0.5
+  image: "docker://ghcr.io/liujs123456/mcp-cellqc@sha256:c9e83a362e6bc7a10609d76d53861f5ac59fade870e262d86aba8399d4c724e1"
   cpus: "16"
   mem_gb: "80"
   time_limit: "02:00:00"
@@ -31,8 +31,11 @@ community skill pins the fork validation image; the released standalone skill ke
 The 0.0.3 validation image failed strict parity: its full three-sample run retained 34,274 cells
 in total, but human barcode membership and doublet/ambient diagnostics differed from the
 original environment. Version 0.0.4 restores all 508 original scientific package archives and
-isolates the MCP interpreter. Require recorded strict parity and website acceptance before
-cutover; successful task completion alone does not establish interchangeable results.
+isolates the MCP interpreter. Version 0.0.5 preserves that environment and fixes activation
+for the default Docker entry point. Its image/default-CLI smoke passed; the frozen-environment
+full-cohort comparison and the 0.0.5 website acceptance are still pending. Require recorded
+strict parity and website acceptance before cutover; successful task completion alone does
+not establish interchangeable results.
 
 ## Admit the correct inputs
 

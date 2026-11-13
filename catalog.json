@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "registry": "aiscientist-skills",
-  "registry_version": "0.2.1",
-  "generator": "aiscientist-skills 0.2.1",
+  "registry_version": "0.2.2",
+  "generator": "aiscientist-skills 0.2.2",
   "categories": [
     {
       "name": "crispr-screens",
@@ -168,7 +168,7 @@
         "literature"
       ],
       "license": "MIT",
-      "tested_with": "aiscientist-mcp-literature 0.0.1, common 0.0.3; real Europe PMC and staged RetiGene/PubMedBERT retrieval, Python 3.12.13; generative acceptance tracked separately",
+      "tested_with": "aiscientist-mcp-literature 0.0.3, common 0.0.4; real Europe PMC and staged RetiGene/PubMedBERT retrieval; native predecessor has cited-answer and partial-curation evidence",
       "author": "",
       "requirements": {
         "compute": "Public search and local retrieval tested; model answer/curation resources depend on the configured deployment",
@@ -256,7 +256,7 @@
         "scrna-analysis"
       ],
       "license": "MIT",
-      "tested_with": "aiscientist-mcp-scrna-analysis 0.0.1, common 0.0.3, MCP 2.3.0, scanpy 1.12.5; 11 tools compared with original code on real HECA counts",
+      "tested_with": "aiscientist-mcp-scrna-analysis 0.0.3, common 0.0.4, MCP 2.3.0, scanpy 1.12.5; 11 tools compared with original code on real HECA counts",
       "author": "",
       "requirements": {
         "compute": "4 CPUs, 48 GB requested; 480 real cells x 1550 genes, 6 samples, 2 tissue regions; this is a regression subset, not full-atlas sizing",
@@ -281,10 +281,10 @@
         "scgpt-annotation"
       ],
       "license": "MIT",
-      "tested_with": "aiscientist-mcp-scgpt-annotation 0.0.1, common 0.0.3, torch 2.3.0, scGPT 0.2.4, scanpy 1.11.5, anndata 0.11.4; real GPU old/new parity on 480 HECA cells",
+      "tested_with": "aiscientist-mcp-scgpt-annotation 0.0.3, common 0.0.4, torch 2.3.0, scGPT 0.2.4, scanpy 1.11.5, anndata 0.11.4; real GPU old/new parity on 480 HECA cells",
       "author": "",
       "requirements": {
-        "compute": "NVIDIA A30, 4 CPUs, 48 GB requested; 480 cells x 36601 genes; native inference 57.3 seconds in the tested allocation",
+        "compute": "NVIDIA V100 or A30, 4 CPUs, 48 GB requested; 480 cells x 36601 genes; final-image V100 inference 42.5 seconds; earlier A30 validation 40.8 seconds",
         "gpu": true,
         "scheduler": "optional",
         "network": "install",
@@ -483,7 +483,7 @@
         "cellqc"
       ],
       "license": "MIT",
-      "tested_with": "aiscientist-mcp-cellqc 0.0.1, common 0.0.3; native MCP and original calculation regression tests; CellQC 0.3.6 image build",
+      "tested_with": "aiscientist-mcp-cellqc 0.0.4, common 0.0.4; native MCP and original calculation regression tests; CellQC 0.3.6 image build",
       "author": "",
       "requirements": {
         "compute": "Service default: 16 CPUs, 80 GB, 8 hours; size the real cohort separately",
@@ -567,7 +567,7 @@
         "data-utilities"
       ],
       "license": "MIT",
-      "tested_with": "aiscientist-mcp-data-utilities 0.0.1, common 0.0.3, MCP 2.3.0, Python 3.14.3, Graphviz 2.44.0; real 1.35 GB HECA file and original PNG parity",
+      "tested_with": "aiscientist-mcp-data-utilities 0.0.2, common 0.0.4, MCP 2.3.0, Python 3.14.3, Graphviz 2.44.0; real 1.35 GB HECA file and original PNG parity",
       "author": "",
       "requirements": {
         "compute": "1 CPU, 4 GB requested; bounded inspection 12.9 seconds, schematic 0.5 seconds in the tested allocation",
@@ -592,7 +592,7 @@
         "variant-annotation"
       ],
       "license": "MIT",
-      "tested_with": "aiscientist-mcp-variant-annotation 0.0.1, common 0.0.3; native MCP and deterministic VEP/bcftools regression fixtures; release-112.0 VEP image build",
+      "tested_with": "aiscientist-mcp-variant-annotation 0.0.2, common 0.0.4; native MCP and deterministic VEP/bcftools regression fixtures; release-112.0 VEP image build",
       "author": "",
       "requirements": {
         "compute": "Service default: 8 CPUs, 32 GB, 8 hours; reference downloads and real callset acceptance are deployment-specific",
@@ -739,7 +739,7 @@
         "phenotype-diagnosis"
       ],
       "license": "MIT",
-      "tested_with": "aiscientist-mcp-phenotype-diagnosis 0.0.1, common 0.0.3, Python 3.14.3; real staged LIRICAL on synthetic HPO input; model extraction/adjudication acceptance tracked separately",
+      "tested_with": "aiscientist-mcp-phenotype-diagnosis 0.0.3, common 0.0.4; real staged LIRICAL on synthetic HPO input; native predecessor also exercised model extraction and literature adjudication",
       "author": "",
       "requirements": {
         "compute": "Real staged LIRICAL phenotype-only check: 8621 candidates; input was synthetic, not patient data",

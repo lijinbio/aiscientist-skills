@@ -7,14 +7,18 @@ metadata:
   version: 0.1.0
   status: community
   tags: mcp, cellqc
-  tested-with: aiscientist-mcp-cellqc 0.0.1, common 0.0.3; native MCP and original calculation regression tests; CellQC 0.3.6 image build
+  tested-with: aiscientist-mcp-cellqc 0.0.4, common 0.0.4; native MCP and original calculation regression tests; CellQC 0.3.6 image build
   compute: 'Service default: 16 CPUs, 80 GB, 8 hours; size the real cohort separately'
   requires-gpu: 'false'
   scheduler: optional
   requires-network: install
   requires-secrets: none
   mcp-server: cellqc
-  mcp-package-version: 0.0.1
+  mcp-package-version: 0.0.4
+  image: "docker://ghcr.io/liujs123456/mcp-cellqc@sha256:0c0eb0e7595328742619289fab68a14706ba7154c50736818f81574909a5ebe4"
+  cpus: "16"
+  mem_gb: "80"
+  time_limit: "02:00:00"
 ---
 
 # QC Cell Ranger deliveries through MCP
@@ -22,7 +26,13 @@ metadata:
 Use the registered `cellqc` service for raw 10x deliveries, retaining the current
 `qc-snrna-with-cellqc-standalone` workflow when that service is unavailable. Discover the real
 client tool names and schemas; do not assume an unregistered `mcp_` alias exists. This new
-community skill has no image pin and does not replace the released standalone skill's image.
+community skill pins the fork validation image; the released standalone skill keeps its own image.
+
+The 0.0.3 validation image failed strict parity: its full three-sample run retained 34,274 cells
+in total, but human barcode membership and doublet/ambient diagnostics differed from the
+original environment. Version 0.0.4 restores all 508 original scientific package archives and
+isolates the MCP interpreter. Require recorded strict parity and website acceptance before
+cutover; successful task completion alone does not establish interchangeable results.
 
 ## Admit the correct inputs
 

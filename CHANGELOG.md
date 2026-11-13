@@ -6,12 +6,16 @@ All notable changes to this repository are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-11-12
+
 ### Added
 
 - Seven community, instruction-only MCP migration skills for scRNA analysis, CellQC, scGPT,
   literature, variant annotation, phenotype ranking and data utilities, with trigger evals.
   They require an actually registered service, preserve existing standalone/legacy workflows,
-  distinguish real and synthetic acceptance evidence, and leave image pins unset until release.
+  distinguish real and synthetic acceptance evidence, and pin published fork validation images
+  with explicit CPU, memory and time requests. Registration and trusted reference/model settings
+  remain deployment configuration; these preview pins do not change existing production tools.
 - The `utilities` category for bounded dataset inspection and deterministic schematic rendering.
 
 ### Fixed

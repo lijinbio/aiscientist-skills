@@ -7,22 +7,26 @@ metadata:
   version: 0.1.0
   status: community
   tags: mcp, literature
-  tested-with: aiscientist-mcp-literature 0.0.1, common 0.0.3; real Europe PMC and staged RetiGene/PubMedBERT retrieval, Python 3.12.13; generative acceptance tracked separately
+  tested-with: aiscientist-mcp-literature 0.0.3, common 0.0.4; real Europe PMC and staged RetiGene/PubMedBERT retrieval; native predecessor has cited-answer and partial-curation evidence
   compute: Public search and local retrieval tested; model answer/curation resources depend on the configured deployment
   requires-gpu: 'false'
   scheduler: optional
   requires-network: runtime
   requires-secrets: none
   mcp-server: literature
-  mcp-package-version: 0.0.1
+  mcp-package-version: 0.0.3
+  image: "docker://ghcr.io/liujs123456/mcp-literature@sha256:655ad065365672a67b8b6e8ba3f1cc71a7afde141e28ed47b73f17f9eb1c148b"
+  cpus: "4"
+  mem_gb: "24"
+  time_limit: "01:00:00"
 ---
 
 # Read scientific evidence with the literature MCP service
 
 Discover the registered `literature` service and its actual tools. If it is unavailable, keep
 existing literature tools and installed corpus/PDF skills. Do not assume a prefixed MCP tool
-exists or replace a working model credential/billing path. This migration skill has no image
-pin and does not install or enable a service by itself.
+exists or replace a working model credential/billing path. This skill pins a published fork validation image; service registration and trusted
+reference/model settings are still supplied by the operator.
 
 ## Pick a tool by the evidence needed
 
@@ -49,13 +53,18 @@ or model identity while resuming judgments; start a new `analysis_id` for those 
 server-side model settings; absent settings are a deployment failure, not permission to invent
 an answer. Public search sends its keywords to Europe PMC, and PaperQA can request bibliographic
 metadata. Keep clinical identifiers out of a public search unless that transmission is intended.
-A configured model receives the evidence required by its operation. The model transport supports
-OpenAI-compatible endpoints, not native Anthropic `/messages`. Credentials are never tool arguments.
-User API-key sessions keep the application's existing trusted credential/billing path.
+A configured model receives the evidence required by its operation. Standalone deployments use
+OpenAI-compatible endpoints. AiScientist can bind the selected session model through its guarded
+gateway relay, including native Anthropic: provider credentials stay on the gateway and each call
+keeps its usage/budget checks. Credentials are never tool arguments. Claude uses supported provider
+sampling defaults and low effort when a worker requests thinking off; do not claim temperature-zero
+or identical model answers across providers.
 
-The standalone server cannot enforce a provider-specific dollar budget: positive
-`max_cost_usd` is refused. Use the deployment's spending controls instead of claiming a tool
-cap limits costs.
+The AiScientist relay reports actual priced usage to extraction's pilot and spending checks.
+With a positive `max_cost_usd`, inspect the pilot's projected total before a full scan. Further
+calls stop after the cap is reached; one already running provider call may cross it. Missing
+accounting stops further calls. A standalone endpoint without this explicit usage protocol
+refuses a positive dollar cap; use its deployment's spending controls.
 
 ## Finish and validate
 
@@ -70,6 +79,8 @@ artifact tables contain the complete data; total counts are not the preview leng
 no retrieved evidence from evidence that contradicts a claim. Report corpus/model versions,
 method, limits, task IDs and only citations that support the associated statement.
 
-The native service has real Europe PMC and staged RetiGene/PubMedBERT retrieval checks plus
-synthetic protocol/algorithm regression tests. Generative answer and curation deployment
-acceptance is a separate gate; these retrieval checks alone do not establish it.
+Native-image acceptance includes Europe PMC, RetiGene/PubMedBERT retrieval and a cited answer
+to a public PRPF31 deletion/segregation question. A broader mechanism question abstained despite
+retrieved contexts. The four-passage extraction smoke produced a flagged gene candidate, not a
+validated gene list or whole-corpus curation. Verify the actual answer and review flags for
+each new question; successful execution alone does not establish scientific support.

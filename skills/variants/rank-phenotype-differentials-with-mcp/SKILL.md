@@ -7,14 +7,18 @@ metadata:
   version: 0.1.0
   status: community
   tags: mcp, phenotype-diagnosis
-  tested-with: aiscientist-mcp-phenotype-diagnosis 0.0.1, common 0.0.3, Python 3.14.3; real staged LIRICAL on synthetic HPO input; model extraction/adjudication acceptance tracked separately
+  tested-with: aiscientist-mcp-phenotype-diagnosis 0.0.3, common 0.0.4; real staged LIRICAL on synthetic HPO input; native predecessor also exercised model extraction and literature adjudication
   compute: 'Real staged LIRICAL phenotype-only check: 8621 candidates; input was synthetic, not patient data'
   requires-gpu: 'false'
   scheduler: optional
   requires-network: runtime
   requires-secrets: none
   mcp-server: phenotype-diagnosis
-  mcp-package-version: 0.0.1
+  mcp-package-version: 0.0.3
+  image: "docker://ghcr.io/liujs123456/mcp-phenotype-diagnosis@sha256:bbd67d80aa82861b0c095643e162c2449218b4bbba9e09ce8ffbd958b72eb8d3"
+  cpus: "4"
+  mem_gb: "24"
+  time_limit: "01:00:00"
 ---
 
 # Rank a phenotype differential through MCP
@@ -30,8 +34,10 @@ Call `map_phenotype_to_hpo(text, k)` with a stable `analysis_id`. Inspect each o
 excluded term, label, supporting phrase, ontology version, unmapped phrase and warning.
 Do not turn family history, hypothetical findings, or negation into observed patient features.
 
-Model extraction requires the operator-configured OpenAI-compatible endpoint; native
-Anthropic `/messages` is not supported by this transport. The conservative lexical fallback
+Standalone model extraction requires an operator-configured OpenAI-compatible endpoint.
+AiScientist can bind its selected session model, including native Anthropic, through the guarded
+gateway relay with per-call usage and budget checks. Provider credentials stay on the gateway.
+The conservative lexical fallback
 can return `mode="needs_llm"` for negation/family-history text with no asserted terms. That
 means the mapping is unresolved, not that the person has no phenotype. Correct the inputs
 from evidence before proceeding; do not fill in missing terms from prior expectations.

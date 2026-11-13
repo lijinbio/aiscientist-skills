@@ -7,14 +7,18 @@ metadata:
   version: 0.1.0
   status: community
   tags: mcp, scgpt-annotation
-  tested-with: aiscientist-mcp-scgpt-annotation 0.0.1, common 0.0.3, torch 2.3.0, scGPT 0.2.4, scanpy 1.11.5, anndata 0.11.4; real GPU old/new parity on 480 HECA cells
-  compute: NVIDIA A30, 4 CPUs, 48 GB requested; 480 cells x 36601 genes; native inference 57.3 seconds in the tested allocation
+  tested-with: aiscientist-mcp-scgpt-annotation 0.0.3, common 0.0.4, torch 2.3.0, scGPT 0.2.4, scanpy 1.11.5, anndata 0.11.4; real GPU old/new parity on 480 HECA cells
+  compute: NVIDIA V100 or A30, 4 CPUs, 48 GB requested; 480 cells x 36601 genes; final-image V100 inference 42.5 seconds; earlier A30 validation 40.8 seconds
   requires-gpu: 'true'
   scheduler: optional
   requires-network: install
   requires-secrets: none
   mcp-server: scgpt-annotation
-  mcp-package-version: 0.0.1
+  mcp-package-version: 0.0.3
+  image: "docker://ghcr.io/liujs123456/mcp-scgpt-annotation@sha256:1133d106342831e9d6cd7fc5961e38eb2043142852219105bac269065213b2d5"
+  cpus: "4"
+  mem_gb: "48"
+  time_limit: "01:00:00"
 ---
 
 # Annotate cells with the scGPT MCP service
@@ -22,8 +26,7 @@ metadata:
 This is reference-model inference with the validated scGPT harness. It does not ask a language
 model to name cells. Use the client's registered `scgpt-annotation` tools and advertised names;
 if unavailable, retain the existing approved scGPT deployment. Do not invent an MCP prefix,
-download unapproved weights, or change the released standalone workflow's environment. This
-skill intentionally has no image pin until a real release is registered.
+download unapproved weights, or change the released standalone workflow's environment. The pinned image is a fork validation release; external assets remain operator supplied.
 
 ## Verify external assets and GPU
 
@@ -64,9 +67,12 @@ mouse-to-human retinal transfer needs particular care for glial and vascular lab
 unassigned or uncertain results rather than forcing agreement. The existing
 `crossvalidate-scgpt-vs-leiden` skill remains useful for that separate analysis.
 
-A real A30 run on 480 public human-retina cells matched the original deployed harness's
+A real V100 run on 480 public human-retina cells matched the original deployed harness's
 barcode-aligned predictions and confidence values with zero differences at tolerance 1e-6,
-using identical weights, scientific image and prepared query. Nullable-string compatibility
+using identical weights, scientific image and prepared query. Matched A30 runs also agreed
+exactly between old and new workflows. Comparing A30 with V100 preserved all 480 labels but
+changed 35 confidence values by at most 0.0026; record the GPU when comparing confidence.
+Nullable-string compatibility
 was exercised on a new AnnData checkpoint. This is migration parity, not an accuracy benchmark
 or proof that a different model/species transfer is valid. Record the actual model/harness/image
 identities, GPU, task IDs, cell counts, compatibility changes and collected outputs.

@@ -7,14 +7,18 @@ metadata:
   version: 0.1.0
   status: community
   tags: mcp, scrna-analysis
-  tested-with: aiscientist-mcp-scrna-analysis 0.0.1, common 0.0.3, MCP 2.3.0, scanpy 1.12.5; 11 tools compared with original code on real HECA counts
+  tested-with: aiscientist-mcp-scrna-analysis 0.0.3, common 0.0.4, MCP 2.3.0, scanpy 1.12.5; 11 tools compared with original code on real HECA counts
   compute: 4 CPUs, 48 GB requested; 480 real cells x 1550 genes, 6 samples, 2 tissue regions; this is a regression subset, not full-atlas sizing
   requires-gpu: 'false'
   scheduler: optional
   requires-network: install
   requires-secrets: none
   mcp-server: scrna-analysis
-  mcp-package-version: 0.0.1
+  mcp-package-version: 0.0.3
+  image: "docker://ghcr.io/liujs123456/mcp-scrna-analysis@sha256:945b05f973fee2aaa273461bedd2fe64948a1f0cc2ebe569c6c145106d71c92c"
+  cpus: "4"
+  mem_gb: "48"
+  time_limit: "01:00:00"
 ---
 
 # Analyze single-cell data with the scRNA MCP service
@@ -28,7 +32,7 @@ Read the client's actual tool inventory and advertised schemas. Tool names below
 server's native names; a host may qualify them. Do not invent a `mcp_` prefix or call an
 unregistered name. If this service is absent, keep the currently available AiScientist tools
 or the installed standalone analysis skill. This migration skill does not change their image,
-install an unpublished release, or retire the legacy path. No production image pin is declared.
+install an unpublished release, or retire the legacy path. Its image pin names the published fork validation release.
 
 The service operator binds `SCRNA_DATASET`, `SCRNA_READ_ROOTS`, and writable `AISCI_DATA_DIR`.
 An explicit `dataset` must be admitted on the server host. Tool `input` selects a checkpoint

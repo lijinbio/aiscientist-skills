@@ -7,14 +7,18 @@ metadata:
   version: 0.1.0
   status: community
   tags: mcp, variant-annotation
-  tested-with: aiscientist-mcp-variant-annotation 0.0.1, common 0.0.3; native MCP and deterministic VEP/bcftools regression fixtures; release-112.0 VEP image build
+  tested-with: aiscientist-mcp-variant-annotation 0.0.2, common 0.0.4; native MCP and deterministic VEP/bcftools regression fixtures; release-112.0 VEP image build
   compute: 'Service default: 8 CPUs, 32 GB, 8 hours; reference downloads and real callset acceptance are deployment-specific'
   requires-gpu: 'false'
   scheduler: optional
   requires-network: runtime
   requires-secrets: none
   mcp-server: variant-annotation
-  mcp-package-version: 0.0.1
+  mcp-package-version: 0.0.2
+  image: "docker://ghcr.io/liujs123456/mcp-variant-annotation@sha256:92c875d268b8f89054860cedd13dcbd5b53498e9321868180e9e56a2b56eb388"
+  cpus: "4"
+  mem_gb: "16"
+  time_limit: "01:00:00"
 ---
 
 # Annotate a VCF through the variant MCP service

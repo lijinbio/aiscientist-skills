@@ -4,7 +4,7 @@ description: Run ambient correction, filtering and doublet removal through an al
 license: MIT
 metadata:
   category: single-cell
-  version: 0.1.1
+  version: 0.1.2
   status: community
   tags: mcp, cellqc
   tested-with: aiscientist-mcp-cellqc 0.0.5, common 0.0.4; image and default Docker CLI smoke; frozen CellQC 0.3.6 environment; strict cohort parity and website acceptance pending
@@ -15,7 +15,7 @@ metadata:
   requires-secrets: none
   mcp-server: cellqc
   mcp-package-version: 0.0.5
-  image: "docker://ghcr.io/liujs123456/mcp-cellqc@sha256:c9e83a362e6bc7a10609d76d53861f5ac59fade870e262d86aba8399d4c724e1"
+  image: "docker://ghcr.io/lijinbio/mcp-cellqc@sha256:d0f456eb4c76c848dc671dfc2e9bcae5221e5bfd5363b2acd8d3769749e3b500"
   cpus: "16"
   mem_gb: "80"
   time_limit: "02:00:00"
@@ -26,7 +26,7 @@ metadata:
 Use the registered `cellqc` service for raw 10x deliveries, retaining the current
 `qc-snrna-with-cellqc-standalone` workflow when that service is unavailable. Discover the real
 client tool names and schemas; do not assume an unregistered `mcp_` alias exists. This new
-community skill pins the fork validation image; the released standalone skill keeps its own image.
+community skill pins the upstream `cellqc-v0.0.5` release image; the released standalone skill keeps its own image.
 
 The 0.0.3 validation image failed strict parity: its full three-sample run retained 34,274 cells
 in total, but human barcode membership and doublet/ambient diagnostics differed from the

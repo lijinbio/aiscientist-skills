@@ -4,7 +4,7 @@ description: Search citations, retrieve local corpus passages, answer with Paper
 license: MIT
 metadata:
   category: literature
-  version: 0.1.1
+  version: 0.1.2
   status: community
   tags: mcp, literature
   tested-with: aiscientist-mcp-literature 0.0.4, common 0.0.4; bounded complete-result resources verified by local real MCP protocol tests; final image and website acceptance pending; predecessor has public search, retrieval and cited-answer evidence
@@ -15,7 +15,7 @@ metadata:
   requires-secrets: none
   mcp-server: literature
   mcp-package-version: 0.0.4
-  image: "docker://ghcr.io/liujs123456/mcp-literature@sha256:ea3d66b0b7bc6f217da5dd78e1fd16ae018cea780e45728a097fbaa306fd12e7"
+  image: "docker://ghcr.io/lijinbio/mcp-literature@sha256:05ab531fb89a886e43af07d9730252c0db81a7b7e52c46b5f81bc457f53460ad"
   cpus: "4"
   mem_gb: "24"
   time_limit: "01:00:00"
@@ -25,7 +25,7 @@ metadata:
 
 Discover the registered `literature` service and its actual tools. If it is unavailable, keep
 existing literature tools and installed corpus/PDF skills. Do not assume a prefixed MCP tool
-exists or replace a working model credential/billing path. This skill pins a published fork validation image; service registration and trusted
+exists or replace a working model credential/billing path. This skill pins the upstream `literature-v0.0.4` release image; service registration and trusted
 reference/model settings are still supplied by the operator.
 
 ## Pick a tool by the evidence needed

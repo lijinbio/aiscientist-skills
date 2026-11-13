@@ -6,6 +6,60 @@ All notable changes to this repository are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.5] - 2026-11-13
+
+### Fixed
+
+- Literature and phenotype MCP skills 0.1.1 pin the published 0.0.4 images.
+  Complete literature evidence is transferred through bounded MCP resources with
+  identity, size, offset and SHA-256 checks. Local real-protocol tests passed;
+  released-image and selected-session website gates remain pending. The earlier
+  website LIRICAL-only result is retained as failed literature-adjudication evidence.
+- `single-cell/analyze-scrna-with-mcp` 0.1.2 records the now-passing final 0.0.5
+  native HPC regression. Its image pin is unchanged; website acceptance remains
+  separate. Historical 0.2.4 pending-test provenance is preserved.
+
+## [0.2.4] - 2026-11-13
+
+### Fixed
+
+- `single-cell/analyze-scrna-with-mcp` 0.1.1 pins the published scRNA MCP 0.0.5 image.
+  Its provenance records the frozen Scanpy 1.11.5 scientific stack, explicit
+  `deployed-auto-combat-v1` default policy, optional explicit Harmony, and private
+  nullable-metadata normalization. Released SIF CLI/schema/file verification passed;
+  full native and website acceptance remain separate pending gates. Earlier
+  same-environment algorithm parity is not presented as old-environment equivalence.
+  No other skill image changes in this registry release.
+
+## [0.2.3] - 2026-11-13
+
+### Fixed
+
+- `single-cell/qc-cellranger-with-mcp` 0.1.1 pins the published CellQC MCP 0.0.5 image
+  by its release digest. It retains the frozen scientific environment from 0.0.4 and
+  fixes default Docker entry-point activation. The skill distinguishes the passing
+  image/CLI smoke from still-pending strict full-cohort parity and website acceptance.
+  No other skill image changes in this registry release.
+
+## [0.2.2] - 2026-11-12
+
+### Added
+
+- Seven community, instruction-only MCP migration skills for scRNA analysis, CellQC, scGPT,
+  literature, variant annotation, phenotype ranking and data utilities, with trigger evals.
+  They require an actually registered service, preserve existing standalone/legacy workflows,
+  distinguish real and synthetic acceptance evidence, and pin published fork validation images
+  with explicit CPU, memory and time requests. Registration and trusted reference/model settings
+  remain deployment configuration; these preview pins do not change existing production tools.
+- The `utilities` category for bounded dataset inspection and deterministic schematic rendering.
+
+### Fixed
+
+- `single-cell/explore-atlas-expression-with-aiscientist-mcp`: use AiScientist's typed MCP
+  tools and `atlas_write_report` for the query report. Standalone MCP and CLI clients retain
+  the server's `write_report` name; dataset binding, execution settings and artifact collection
+  are supplied by the AiScientist bridge.
+
 ## [0.2.1] - 2026-11-10
 
 ### Added

@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "registry": "aiscientist-skills",
-  "registry_version": "0.2.1",
-  "generator": "aiscientist-skills 0.2.1",
+  "registry_version": "0.2.5",
+  "generator": "aiscientist-skills 0.2.5",
   "categories": [
     {
       "name": "crispr-screens",
@@ -19,6 +19,10 @@
     {
       "name": "single-cell",
       "description": "Single-cell and single-nucleus RNA-seq: QC, integration, annotation and downstream analysis."
+    },
+    {
+      "name": "utilities",
+      "description": "Scientific data triage and deterministic conceptual figures through configured analysis services."
     },
     {
       "name": "variants",
@@ -153,6 +157,31 @@
       "has_tests": true
     },
     {
+      "name": "read-evidence-with-mcp",
+      "category": "literature",
+      "path": "skills/literature/read-evidence-with-mcp",
+      "version": "0.1.1",
+      "status": "community",
+      "description": "Search citations, retrieve local corpus passages, answer with PaperQA or curate grounded gene evidence through an already configured literature MCP service. Use when that service and the required corpus/model are available and task coverage, citations and partial results must be tracked; retain current retrieval tools when the MCP service is absent.",
+      "tags": [
+        "mcp",
+        "literature"
+      ],
+      "license": "MIT",
+      "tested_with": "aiscientist-mcp-literature 0.0.4, common 0.0.4; bounded complete-result resources verified by local real MCP protocol tests; final image and website acceptance pending; predecessor has public search, retrieval and cited-answer evidence",
+      "author": "",
+      "requirements": {
+        "compute": "Public search and local retrieval tested; model answer/curation resources depend on the configured deployment",
+        "gpu": false,
+        "scheduler": "optional",
+        "network": "runtime",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": false,
+      "has_tests": false
+    },
+    {
       "name": "read-whole-corpus-with-claude",
       "category": "literature",
       "path": "skills/literature/read-whole-corpus-with-claude",
@@ -209,6 +238,56 @@
         "gpu": false,
         "scheduler": "none",
         "network": "runtime",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": false,
+      "has_tests": false
+    },
+    {
+      "name": "analyze-scrna-with-mcp",
+      "category": "single-cell",
+      "path": "skills/single-cell/analyze-scrna-with-mcp",
+      "version": "0.1.2",
+      "status": "community",
+      "description": "Run QC, clustering, differential expression, enrichment and marker annotation through an already configured scrna-analysis MCP service. Use for an AnnData workflow when this service is available and its checkpoints and asynchronous task results must be carried between steps; retain the existing standalone workflow when it is not registered.",
+      "tags": [
+        "mcp",
+        "scrna-analysis"
+      ],
+      "license": "MIT",
+      "tested_with": "aiscientist-mcp-scrna-analysis 0.0.5, common 0.0.4; frozen scientific Python 3.11.15 and Scanpy 1.11.5; released SIF CLI/schema/file verification and full native HPC regression passed; website acceptance is separate",
+      "author": "",
+      "requirements": {
+        "compute": "4 CPUs, 48 GB requested; 480 real cells x 1550 genes, 6 samples, 2 tissue regions; this is a regression subset, not full-atlas sizing",
+        "gpu": false,
+        "scheduler": "optional",
+        "network": "install",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": false,
+      "has_tests": false
+    },
+    {
+      "name": "annotate-cells-with-scgpt-mcp",
+      "category": "single-cell",
+      "path": "skills/single-cell/annotate-cells-with-scgpt-mcp",
+      "version": "0.1.0",
+      "status": "community",
+      "description": "Transfer cell labels from an approved reference model through an already configured scgpt-annotation MCP service. Use for GPU inference on an AnnData query when the validated harness and model are staged, then check predictions against independent structure and markers; do not substitute it for a marker-only annotation or assume the service is installed.",
+      "tags": [
+        "mcp",
+        "scgpt-annotation"
+      ],
+      "license": "MIT",
+      "tested_with": "aiscientist-mcp-scgpt-annotation 0.0.3, common 0.0.4, torch 2.3.0, scGPT 0.2.4, scanpy 1.11.5, anndata 0.11.4; real GPU old/new parity on 480 HECA cells",
+      "author": "",
+      "requirements": {
+        "compute": "NVIDIA V100 or A30, 4 CPUs, 48 GB requested; 480 cells x 36601 genes; final-image V100 inference 42.5 seconds; earlier A30 validation 40.8 seconds",
+        "gpu": true,
+        "scheduler": "optional",
+        "network": "install",
         "secrets": [],
         "allowed_tools": ""
       },
@@ -393,6 +472,31 @@
       "has_tests": true
     },
     {
+      "name": "qc-cellranger-with-mcp",
+      "category": "single-cell",
+      "path": "skills/single-cell/qc-cellranger-with-mcp",
+      "version": "0.1.1",
+      "status": "community",
+      "description": "Run ambient correction, filtering and doublet removal through an already configured CellQC MCP service for raw and filtered Cell Ranger deliveries. Use when this service is present and QC checkpoints must feed another analysis service; keep the standalone CellQC method for deployments without the MCP service.",
+      "tags": [
+        "mcp",
+        "cellqc"
+      ],
+      "license": "MIT",
+      "tested_with": "aiscientist-mcp-cellqc 0.0.5, common 0.0.4; image and default Docker CLI smoke; frozen CellQC 0.3.6 environment; strict cohort parity and website acceptance pending",
+      "author": "",
+      "requirements": {
+        "compute": "Service default: 16 CPUs, 80 GB, 8 hours; size the real cohort separately",
+        "gpu": false,
+        "scheduler": "optional",
+        "network": "install",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": false,
+      "has_tests": false
+    },
+    {
       "name": "qc-snrna-with-cellqc-standalone",
       "category": "single-cell",
       "path": "skills/single-cell/qc-snrna-with-cellqc-standalone",
@@ -450,6 +554,56 @@
       },
       "has_code": true,
       "has_tests": true
+    },
+    {
+      "name": "inspect-data-and-draw-schematics-with-mcp",
+      "category": "utilities",
+      "path": "skills/utilities/inspect-data-and-draw-schematics-with-mcp",
+      "version": "0.1.0",
+      "status": "community",
+      "description": "Inspect an admitted data file and render a conceptual Graphviz schematic through an already configured data-utilities MCP service. Use for bounded format/metadata triage or a reproducible workflow figure with that service; do not use schematics as data plots or assume an unregistered MCP tool exists.",
+      "tags": [
+        "mcp",
+        "data-utilities"
+      ],
+      "license": "MIT",
+      "tested_with": "aiscientist-mcp-data-utilities 0.0.2, common 0.0.4, MCP 2.3.0, Python 3.14.3, Graphviz 2.44.0; real 1.35 GB HECA file and original PNG parity",
+      "author": "",
+      "requirements": {
+        "compute": "1 CPU, 4 GB requested; bounded inspection 12.9 seconds, schematic 0.5 seconds in the tested allocation",
+        "gpu": false,
+        "scheduler": "optional",
+        "network": "runtime",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": false,
+      "has_tests": false
+    },
+    {
+      "name": "annotate-vcf-with-mcp",
+      "category": "variants",
+      "path": "skills/variants/annotate-vcf-with-mcp",
+      "version": "0.1.0",
+      "status": "community",
+      "description": "Annotate an admitted VCF through an already configured variant-annotation MCP service using matching offline VEP references, then inspect complete consequence, frequency and ClinVar tables. Use for this service deployment and its asynchronous results; retain the existing VCF workflow when it is unavailable and never silently switch private variants to REST.",
+      "tags": [
+        "mcp",
+        "variant-annotation"
+      ],
+      "license": "MIT",
+      "tested_with": "aiscientist-mcp-variant-annotation 0.0.2, common 0.0.4; native MCP and deterministic VEP/bcftools regression fixtures; release-112.0 VEP image build",
+      "author": "",
+      "requirements": {
+        "compute": "Service default: 8 CPUs, 32 GB, 8 hours; reference downloads and real callset acceptance are deployment-specific",
+        "gpu": false,
+        "scheduler": "optional",
+        "network": "runtime",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": false,
+      "has_tests": false
     },
     {
       "name": "build-variant-db-with-tiledbvcf",
@@ -572,6 +726,31 @@
       },
       "has_code": true,
       "has_tests": true
+    },
+    {
+      "name": "rank-phenotype-differentials-with-mcp",
+      "category": "variants",
+      "path": "skills/variants/rank-phenotype-differentials-with-mcp",
+      "version": "0.1.1",
+      "status": "community",
+      "description": "Map clinical phenotype text to grounded HPO terms and rank a research differential through an already configured phenotype-diagnosis MCP service with LIRICAL and optional literature adjudication. Use for explicit service-based analysis while preserving negation, uncertainty and original probabilities; retain the established workflow when the service is unavailable.",
+      "tags": [
+        "mcp",
+        "phenotype-diagnosis"
+      ],
+      "license": "MIT",
+      "tested_with": "aiscientist-mcp-phenotype-diagnosis 0.0.4, common 0.0.4; complete literature evidence verified by local real MCP protocol tests; final image and website acceptance pending; predecessor has synthetic HPO/LIRICAL evidence",
+      "author": "",
+      "requirements": {
+        "compute": "Real staged LIRICAL phenotype-only check: 8621 candidates; input was synthetic, not patient data",
+        "gpu": false,
+        "scheduler": "optional",
+        "network": "runtime",
+        "secrets": [],
+        "allowed_tools": ""
+      },
+      "has_code": false,
+      "has_tests": false
     },
     {
       "name": "write-variant-tables",

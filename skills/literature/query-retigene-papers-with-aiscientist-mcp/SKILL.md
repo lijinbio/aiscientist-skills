@@ -5,13 +5,13 @@ license: MIT
 compatibility: Requires the aiscientist-mcp packages (common, retigene-rag) or the pinned server image, a copy of the RetiGene index (about 440 MB) with a RetiGene gene table release for the lookups, an MCP client or the bundled CLI client, and a model set in the server's environment (a Claude key or an OpenAI-compatible endpoint; validated on Claude Haiku 5.5). The skill holds no secret. No GPU. Network for the model calls.
 metadata:
   category: literature
-  version: "0.0.1"
+  version: "0.0.2"
   status: community
   author: "Yijun Sun"
   tags: "literature, rag, mcp, retina, inherited-retinal-disease, haploinsufficiency, gene-curation, claude"
-  tested-with: "aiscientist-mcp common 0.0.2 and retigene-rag 0.0.1 (pip, and the image of containers/retigene-rag), mcp 2.3.0, anthropic 1.13.0, Python 3.13.3, Claude Haiku 5.5 and Claude Sonnet 5.5, Claude Code 2.1.205; the RetiGene index of 2026-10-11 (1,736 papers, 426,706 sentences) and the RetiGene gene table v1.15 (779 records)"
+  tested-with: "aiscientist-mcp common 0.0.2 and retigene-rag 0.0.1 (pip, and the image of containers/retigene-rag; 0.0.2 changes only how a gene's two readings are merged when a reply could not be read, unit-tested, and the measurements here refer to 0.0.1), mcp 2.3.0, anthropic 1.13.0, Python 3.13.3, Claude Haiku 5.5 and Claude Sonnet 5.5, Claude Code 2.1.205; the RetiGene index of 2026-10-11 (1,736 papers, 426,706 sentences) and the RetiGene gene table v1.15 (779 records)"
   compute: "one curation: 2.5-3.5 min, 711-770 model calls, 2.2-2.4 M input and 0.45-0.49 M output tokens, $0.31-0.39 with Claude Haiku reading and reviewing ($0.78 with a Claude Sonnet review); asked again it is reused at once, and with rerun it takes 17 s from the reply cache; a gene table lookup answers in one call (27 questions asked twice with Claude Haiku: 53 of 54 correct, the 44 table questions in about 2 turns each); other calls 2-15 s each as one-shot CLI or container calls, most of it loading the corpus (about 2 GB of memory); no GPU"
-  image: "docker://ghcr.io/lijinbio/mcp-retigene-rag@sha256:6c8dbb40bb8b08cd9713fe2765074c90a79ceab2e474c37362ea54e974371149"
+  image: "docker://ghcr.io/lijinbio/mcp-retigene-rag@sha256:bb4325c1d768ad0d2bd05302d747ab2ce7c609e567a2749e0cda28acd4f7d63a"
   cpus: "2"
   mem_gb: "8"
   time_limit: "01:00:00"
@@ -59,13 +59,13 @@ https://retigene.erdc.info/, which the server does not ship: put it in the index
 ## 1. Install the server
 
 The install is pinned to release tags of `lijinbio/aiscientist-mcp`: `common-v0.0.2` and
-`retigene-rag-v0.0.1`.
+`retigene-rag-v0.0.2`.
 
 ```bash
 python3.13 -m venv /path/to/envs/retigene-mcp
 source /path/to/envs/retigene-mcp/bin/activate
 pip install mcp==2.3.0 anthropic==1.13.0 numpy
-for t in common-v0.0.2 retigene-rag-v0.0.1; do
+for t in common-v0.0.2 retigene-rag-v0.0.2; do
   pip install --no-deps --force-reinstall "git+https://github.com/lijinbio/aiscientist-mcp@${t}#subdirectory=packages/${t%-v*}"
 done
 aiscientist-mcp --server retigene-rag-mcp tools   # lists the 12 tools below
@@ -82,10 +82,10 @@ one container per call, with the index mounted read-only and `AISCI_EXECUTOR=inl
 ```bash
 docker run --rm -e AISCI_EXECUTOR=inline -e AISCI_DATA_DIR=/work/data -e RETIGENE_INDEX=/index \
   -e ANTHROPIC_API_KEY -v /path/to/datasets/retigene/v2026.11:/index:ro -v /path/to/work:/work \
-  ghcr.io/lijinbio/mcp-retigene-rag@sha256:6c8dbb40bb8b08cd9713fe2765074c90a79ceab2e474c37362ea54e974371149 aiscientist-mcp --server retigene-rag-mcp tools
+  ghcr.io/lijinbio/mcp-retigene-rag@sha256:bb4325c1d768ad0d2bd05302d747ab2ce7c609e567a2749e0cda28acd4f7d63a aiscientist-mcp --server retigene-rag-mcp tools
 ```
 
-With apptainer, pull the same digest (`apptainer pull mcp-retigene-rag_0.0.1.sif docker://...`), pass the
+With apptainer, pull the same digest (`apptainer pull mcp-retigene-rag_0.0.2.sif docker://...`), pass the
 settings as `APPTAINERENV_<name>` and bind the index and the data folder.
 
 ## 2. Configure

@@ -74,7 +74,7 @@ Single-cell and single-nucleus RNA-seq: QC, integration, annotation and downstre
 | [`compare-conditions-by-celltype`](skills/single-cell/compare-conditions-by-celltype/) | ⚪ community | 1.0.0 | Condition-vs-control differential expression within each cell type (for example KO vs WT, or disease vs control, per cell type) with scanpy rank_genes_groups (Wilcoxon, explicit reference group). |
 | [`compare-two-groups-with-scanpy`](skills/single-cell/compare-two-groups-with-scanpy/) | ⚪ community | 1.0.0 | Differential expression between two named groups of cells (for example disease vs control, or cluster 3 vs cluster 5) with scanpy rank_genes_groups (Wilcoxon) and an explicit reference group, from an AnnData file to a ranked CSV table and a JSON summary. |
 | [`crossvalidate-scgpt-vs-leiden`](skills/single-cell/crossvalidate-scgpt-vs-leiden/) | ⚪ community | 1.0.0 | Cross-validate scGPT per-cell cell-type predictions against the data's own structure. |
-| [`explore-atlas-expression-with-aiscientist-mcp`](skills/single-cell/explore-atlas-expression-with-aiscientist-mcp/) | ⚪ community | 0.0.1 | Answer a gene expression query such as "show LRAT across retinal cell types" on a large single-cell or single-nucleus atlas .h5ad with raw counts, by calling the atlas-expression-exploration MCP server from the aiscientist-mcp repository. |
+| [`explore-atlas-expression-with-aiscientist-mcp`](skills/single-cell/explore-atlas-expression-with-aiscientist-mcp/) | ⚪ community | 0.0.2 | Answer a gene expression query such as "show LRAT across retinal cell types" on a large single-cell or single-nucleus atlas .h5ad with raw counts, by calling the atlas-expression-exploration MCP server from the aiscientist-mcp repository. |
 | [`prioritize-disease-genes-with-atlas`](skills/single-cell/prioritize-disease-genes-with-atlas/) | ⚪ community | 1.0.0 | Prioritize disease-associated genes by combining an existing condition-vs-control differential expression result (per cell type) with a precalculated cell-type atlas, offline. |
 | [`qc-cellranger-with-mcp`](skills/single-cell/qc-cellranger-with-mcp/) | ⚪ community | 0.1.2 | Run ambient correction, filtering and doublet removal through an already configured CellQC MCP service for raw and filtered Cell Ranger deliveries. |
 | [`qc-snrna-with-cellqc-standalone`](skills/single-cell/qc-snrna-with-cellqc-standalone/) | 🟢 core | 1.2.0 | Run the CellQC pipeline (ambient correction, count/feature/mitochondrial filtering, doublet calling, nuclear fraction) over a cohort of 10x Cell Ranger libraries by hand, with bash plus conda or a container, from installing cellqc to validating result/metrics.csv. |
@@ -189,7 +189,7 @@ For AiScientist, run its deployment helper from the **application checkout**:
 
 ```bash
 AISCIENTIST_SKILLS_REPO=lijinbio/aiscientist-skills \
-  bash deploy/deploy_skills.sh v0.2.10
+  bash deploy/deploy_skills.sh v0.2.11
 ```
 
 Verify the bundle and `catalog.json` against the release's `SHA256SUMS`. The application also verifies its configured
@@ -243,7 +243,7 @@ use; the commands below are the same afterwards.
 ```bash
 # without a clone, straight from GitHub (pin a tag for reproducibility)
 pip install git+https://github.com/lijinbio/aiscientist-skills.git
-pipx install git+https://github.com/lijinbio/aiscientist-skills.git@v0.2.10
+pipx install git+https://github.com/lijinbio/aiscientist-skills.git@v0.2.11
 uvx --from git+https://github.com/lijinbio/aiscientist-skills.git aiscientist-skill --help
 
 # from a clone, for contributing (pick one)

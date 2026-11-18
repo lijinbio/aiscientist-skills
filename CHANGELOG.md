@@ -6,6 +6,17 @@ All notable changes to this repository are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.11] - 2026-11-18
+
+### Changed
+
+- `single-cell/explore-atlas-expression-with-aiscientist-mcp` 0.0.2 pins atlas-expression-exploration
+  MCP 0.0.4 (`ghcr.io/lijinbio/mcp-atlas-expression-exploration@sha256:725b31a8cc4f…`). The full-atlas
+  step streams the count matrix instead of loading it: on the 3.18M-nucleus atlas, 8 min and 2.2 GB
+  peak where 0.0.2 needed 218 GiB. The skill's memory request goes from 300 GB to 32 GB, and
+  `get_summary` takes `level` as one of three named values. The LRAT and RHO major-class rows equal
+  those of 0.0.3.
+
 ## [0.2.10] - 2026-11-18
 
 ### Fixed

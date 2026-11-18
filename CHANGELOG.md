@@ -6,6 +6,16 @@ All notable changes to this repository are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.10] - 2026-11-18
+
+### Fixed
+
+- `literature/query-retigene-papers-with-aiscientist-mcp` 0.0.2 pins retigene-rag MCP 0.0.2
+  (`ghcr.io/lijinbio/mcp-retigene-rag@sha256:bb4325c1d768…`, lijinbio/aiscientist-mcp#12). The two
+  readings of a gene are paired by sentence number, and a gene with a sentence that a reading could not
+  read is `unresolved` instead of graded. Grades of a curation in which every reply was read are
+  unchanged, and the recorded measurements refer to 0.0.1.
+
 ## [0.2.9] - 2026-11-16
 
 ### Added

@@ -57,7 +57,7 @@ Scientific literature: recovering, verifying and assembling full-text paper corp
 
 | Skill | Status | Version | What it does |
 | --- | --- | --- | --- |
-| [`query-retigene-papers-with-aiscientist-mcp`](skills/literature/query-retigene-papers-with-aiscientist-mcp/) | ⚪ community | 0.0.1 | Answer a question about inherited retinal disease genes from RetiGene, by calling the retigene-rag MCP server of the aiscientist-mcp repository. |
+| [`query-retigene-papers-with-aiscientist-mcp`](skills/literature/query-retigene-papers-with-aiscientist-mcp/) | ⚪ community | 0.0.2 | Answer a question about inherited retinal disease genes from RetiGene, by calling the retigene-rag MCP server of the aiscientist-mcp repository. |
 | [`read-evidence-with-mcp`](skills/literature/read-evidence-with-mcp/) | ⚪ community | 0.1.2 | Search citations, retrieve local corpus passages, answer with PaperQA or curate grounded gene evidence through an already configured literature MCP service. |
 | [`read-whole-corpus-with-claude`](skills/literature/read-whole-corpus-with-claude/) | ⚪ community | 0.0.1 | Answer a question from a chunked full-text literature corpus completely, by having Claude Haiku read every passage (not the top-k of a search) and return the numbers of the sentences that bear on it, so every quote is verbatim. |
 | [`recover-paper-pdfs`](skills/literature/recover-paper-pdfs/) | ⚪ community | 1.0.0 | Recover and assemble a corpus of scientific paper PDFs from a list of PMIDs or DOIs through a ladder of legal sources (open-access APIs, PMC and Europe PMC, publisher open access, then the user's institutional access through the campus network, VPN or library discovery search), verifying every PDF and tracking each paper in a manifest. |
@@ -189,7 +189,7 @@ For AiScientist, run its deployment helper from the **application checkout**:
 
 ```bash
 AISCIENTIST_SKILLS_REPO=lijinbio/aiscientist-skills \
-  bash deploy/deploy_skills.sh v0.2.9
+  bash deploy/deploy_skills.sh v0.2.10
 ```
 
 Verify the bundle and `catalog.json` against the release's `SHA256SUMS`. The application also verifies its configured
@@ -243,7 +243,7 @@ use; the commands below are the same afterwards.
 ```bash
 # without a clone, straight from GitHub (pin a tag for reproducibility)
 pip install git+https://github.com/lijinbio/aiscientist-skills.git
-pipx install git+https://github.com/lijinbio/aiscientist-skills.git@v0.2.9
+pipx install git+https://github.com/lijinbio/aiscientist-skills.git@v0.2.10
 uvx --from git+https://github.com/lijinbio/aiscientist-skills.git aiscientist-skill --help
 
 # from a clone, for contributing (pick one)
